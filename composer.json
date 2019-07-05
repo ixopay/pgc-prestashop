@@ -1,0 +1,22 @@
+{
+  "name": "cloudpay/cloudpay-prestashop",
+  "description": "CloudPay Processing Gateway plugin for PrestaShop",
+  "license": "GPL-3.0-only",
+  "require": {
+    "php": ">=7.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.0"
+  },
+  "type": "prestashop-plugin",
+  "autoload": {
+    "psr-4": {
+      "CloudPay\\Prestashop\\PaymentMethod\\": "cloudpay/payment_method/",
+      "CloudPay\\Prestashop\\": "cloudpay/",
+      "CloudPay\\Client\\": "cloudpay/client/"
+    }
+  },
+  "config": {
+    "vendor-dir": "cloudpay/vendor"
+  }
+}

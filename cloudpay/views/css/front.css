@@ -1,0 +1,31 @@
+/**
+*
+*/
+
+/**
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
+ */
+
+#CloudPay_payment_button a {
+	padding: 10px;
+	background-color: #FBFBFB;
+}
+
+#CloudPay_payment_button a:hover {
+	background-color: #f6f6f6;
+}
+
+#CloudPay_payment_button a:after {
+	display: block;
+	content: "\f054";
+	position: absolute;
+	right: 15px;
+	margin-top: -11px;
+	top: 50%;
+	font-family: "FontAwesome";
+	font-size: 25px;
+	height: 22px;
+	width: 14px;
+	color: #777777;
+}
