@@ -23,7 +23,7 @@
 
 ## Provide Updates
 
-- Fetch the updated source from this repository.<br>Note: make sure to not overwrite any previous changes you've made for the previous version, or re-apply these changes.
+- Fetch the updated source from this repository (see [Changelog](CHANGELOG.md)).<br>Note: make sure to not overwrite any previous changes you've made for the previous version, or re-apply these changes.
 
 - Run the build script with the same parameters as the first time.
 
