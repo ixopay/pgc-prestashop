@@ -1,0 +1,73 @@
+/**
+*
+*/
+
+/**
+ * Don't forget to prefix your containers with your own identifier
+ * to avoid any conflicts with others containers.
+ */
+
+#content .tab-pane:first-child .panel {
+	border-top-left-radius: 0;
+}
+
+.payment-gateway-header .text-branded,
+.payment-gateway-content .text-branded {
+	color: #00aff0;
+}
+
+.payment-gateway-header h4,
+.payment-gateway-content h4,
+.payment-gateway-content h5 {
+	margin: 2px 0;
+	color: #00aff0;
+	font-size: 1.8em;
+}
+
+.payment-gateway-header h4 {
+	margin-top: 5px;
+}
+
+.payment-gateway-header .col-md-6 {
+	margin-top: 18px;
+}
+
+.payment-gateway-content h4 {
+	margin-bottom: 10px;
+}
+
+.payment-gateway-content h5 {
+	font-size: 1.4em;
+	margin-bottom: 10px;
+}
+
+.payment-gateway-content h6 {
+	font-size: 1.3em;
+	margin: 1px 0 4px 0;
+}
+
+.payment-gateway-header > .col-md-4 {
+	height: 65px;
+	vertical-align: middle;
+	border-left: 1px solid #ddd;
+}
+
+.payment-gateway-header > .col-md-4:first-child {
+	border-left: none;
+}
+
+.payment-gateway-header #create-account-btn {
+	margin-top: 14px;
+}
+
+.payment-gateway-content dd + dt {
+	margin-top: 5px;
+}
+
+.payment-gateway-content ul {
+	padding-left: 15px;
+}
+
+.payment-gateway-content .ul-spaced li {
+	margin-bottom: 5px;
+}
