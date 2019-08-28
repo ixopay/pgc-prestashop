@@ -5,7 +5,7 @@
 - Go to `Modules` > `Module Catalog` in your shop's admin area.
 - Select category `Other`.
 - Click `Install` on the Payment Gateway item.
-  
+
 ## Configuration
 
 Either
@@ -20,10 +20,10 @@ or
 - On the `General` tab: 
     - Enter your credentials.
     - Enable the payment option.
-    - Click `Save` 
+    - Click `Save`
 - On the `CreditCard` tab: 
     - Enter credentials for individual Credit Card options.
     - Enable individual Credit Card options.
-    - Click `Save` 
+    - Click `Save`
 
 The payment option should now be provided to your customers during checkout.
