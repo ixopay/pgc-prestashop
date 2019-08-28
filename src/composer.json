@@ -1,0 +1,19 @@
+{
+  "name": "payment-gateway/payment-gateway-prestashop",
+  "description": "",
+  "type": "prestashop-plugin",
+  "license": "",
+  "require": {
+    "php": ">=7.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "PaymentGateway\\Prestashop\\PaymentMethod\\": "./payment_method/",
+      "PaymentGateway\\Prestashop\\": "./",
+      "PaymentGateway\\Client\\": "./client/"
+    }
+  },
+  "config": {
+    "vendor-dir": "vendor"
+  }
+}
