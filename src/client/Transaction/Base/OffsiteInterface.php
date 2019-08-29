@@ -1,11 +1,11 @@
 <?php
 
 
-namespace PaymentGateway\Client\Transaction\Base;
+namespace PaymentGatewayCloud\Client\Transaction\Base;
 
 /**
  * Interface OffsiteInterface
- * @package PaymentGateway\Client\Transaction
+ * @package PaymentGatewayCloud\Client\Transaction
  */
 interface OffsiteInterface {
 

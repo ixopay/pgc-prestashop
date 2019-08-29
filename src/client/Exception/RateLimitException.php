@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Exception;
+namespace PaymentGatewayCloud\Client\Exception;
 
 /**
  * Class RateLimitException
  *
- * @package PaymentGateway\Client\Exception
+ * @package PaymentGatewayCloud\Client\Exception
  */
 class RateLimitException extends \Exception {
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Callback;
+namespace PaymentGatewayCloud\Client\Callback;
 
 /**
  * Class ChargebackReversalData
  *
- * @package PaymentGateway\Client\Callback
+ * @package PaymentGatewayCloud\Client\Callback
  */
 class ChargebackReversalData {
 

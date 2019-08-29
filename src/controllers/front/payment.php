@@ -2,13 +2,15 @@
 /**
  */
 
+use PaymentGatewayCloud\Client\Transaction\Result;
+
 /**
- * Class PaymentGatewayPaymentModuleFrontController
+ * Class PaymentGatewayCloudPaymentModuleFrontController
  *
  * @extends ModuleFrontController
- * @property PaymentGateway module
+ * @property PaymentGatewayCloud module
  */
-class PaymentGatewayPaymentModuleFrontController extends ModuleFrontController
+class PaymentGatewayCloudPaymentModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
@@ -25,7 +27,7 @@ class PaymentGatewayPaymentModuleFrontController extends ModuleFrontController
         $paymentType = (string) \Tools::getValue('type');
         $prefix = strtoupper($paymentType);
 
-        if (!Configuration::get('PAYMENT_GATEWAY_'.$prefix.'_ENABLED', null)) {
+        if (!Configuration::get('PAYMENT_GATEWAY_CLOUD_'.$prefix.'_ENABLED', null)) {
             die('disabled');
             $this->errors = 'An error occured during the checkout process. Please try again.';
             $this->redirectWithNotifications($this->context->link->getPageLink('order'));
@@ -33,7 +35,7 @@ class PaymentGatewayPaymentModuleFrontController extends ModuleFrontController
 
         $this->module->validateOrder(
             $cart->id,
-            \Configuration::get(PaymentGateway::PAYMENT_GATEWAY_OS_STARTING),
+            \Configuration::get(PaymentGatewayCloud::PAYMENT_GATEWAY_CLOUD_OS_STARTING),
             $cart->getOrderTotal(true),
             $paymentType, // change to nice title
             null,
@@ -51,16 +53,16 @@ class PaymentGatewayPaymentModuleFrontController extends ModuleFrontController
         $currency = new Currency($cart->id_currency);
 
         try {
-            \PaymentGateway\Client\Client::setApiUrl(Configuration::get('PAYMENT_GATEWAY_HOST', null));
-            $client = new \PaymentGateway\Client\Client(
-                Configuration::get('PAYMENT_GATEWAY_ACCOUNT_USER', null),
-                Configuration::get('PAYMENT_GATEWAY_ACCOUNT_PASSWORD', null),
-                Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_API_KEY', null),
-                Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_SHARED_SECRET', null)
+            \PaymentGatewayCloud\Client\Client::setApiUrl(Configuration::get('PAYMENT_GATEWAY_CLOUD_HOST', null));
+            $client = new \PaymentGatewayCloud\Client\Client(
+                Configuration::get('PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER', null),
+                Configuration::get('PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD', null),
+                Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_API_KEY', null),
+                Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SHARED_SECRET', null)
             );
 
-            $debit = new \PaymentGateway\Client\Transaction\Debit();
-            if (Configuration::get('PAYMENT_GATEWAY_'.$prefix.'_SEAMLESS', null)) {
+            $debit = new \PaymentGatewayCloud\Client\Transaction\Debit();
+            if (Configuration::get('PAYMENT_GATEWAY_CLOUD_'.$prefix.'_SEAMLESS', null)) {
                 $token = (string) \Tools::getValue('token');
 
                 if (empty($token)) {
@@ -78,7 +80,7 @@ class PaymentGatewayPaymentModuleFrontController extends ModuleFrontController
 
             $customerData = $order->getCustomer();
 
-            $customer = new \PaymentGateway\Client\Data\Customer();
+            $customer = new \PaymentGatewayCloud\Client\Data\Customer();
             $customer->setFirstName($customerData->firstname);
             $customer->setLastName($customerData->lastname);
             $customer->setEmail($customerData->email);
@@ -104,22 +106,29 @@ class PaymentGatewayPaymentModuleFrontController extends ModuleFrontController
 
             $gatewayReferenceId = $paymentResult->getReferenceId();
 
-            if ($paymentResult->getReturnType() == \PaymentGateway\Client\Transaction\Result::RETURN_TYPE_ERROR) {
+            if ($paymentResult->getReturnType() == Result::RETURN_TYPE_ERROR) {
                 //error handling
                 $errors = $paymentResult->getErrors();
 
                 $this->processFailure($order);
 
-            } elseif ($paymentResult->getReturnType() == \PaymentGateway\Client\Transaction\Result::RETURN_TYPE_REDIRECT) {
+            } elseif ($paymentResult->getReturnType() == Result::RETURN_TYPE_REDIRECT) {
+                if ($paymentResult->getRedirectType() === Result::REDIRECT_TYPE_FULLPAGE) {
+                    // currently default
+                }
+
+                if($paymentResult->getRedirectType() === Result::REDIRECT_TYPE_IFRAME) {
+                    // TODO: display redirect url in an iframe on a custom template, poll shop backend for payment status
+                }
 
                 Tools::redirect($paymentResult->getRedirectUrl());
 
-            } elseif ($paymentResult->getReturnType() == \PaymentGateway\Client\Transaction\Result::RETURN_TYPE_PENDING) {
+            } elseif ($paymentResult->getReturnType() == Result::RETURN_TYPE_PENDING) {
                 //payment is pending, wait for callback to complete
 
                 //setCartToPending();
 
-            } elseif ($paymentResult->getReturnType() == \PaymentGateway\Client\Transaction\Result::RETURN_TYPE_FINISHED) {
+            } elseif ($paymentResult->getReturnType() == Result::RETURN_TYPE_FINISHED) {
 
                 $this->module->validateOrder(
                     $cart->id,
@@ -144,7 +153,7 @@ class PaymentGatewayPaymentModuleFrontController extends ModuleFrontController
 
     private function processFailure($order)
     {
-        if ($order->current_state == Configuration::get(PaymentGateway::PAYMENT_GATEWAY_OS_STARTING)) {
+        if ($order->current_state == Configuration::get(PaymentGatewayCloud::PAYMENT_GATEWAY_CLOUD_OS_STARTING)) {
             $order->setCurrentState(_PS_OS_ERROR_);
             $params = [
                 'submitReorder' => true,

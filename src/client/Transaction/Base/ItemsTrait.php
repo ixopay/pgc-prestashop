@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction\Base;
+namespace PaymentGatewayCloud\Client\Transaction\Base;
 
-use PaymentGateway\Client\Data\Item;
+use PaymentGatewayCloud\Client\Data\Item;
 
 /**
  * Class ItemsTrait
  *
- * @package PaymentGateway\Client\Transaction\Base
+ * @package PaymentGatewayCloud\Client\Transaction\Base
  */
 trait ItemsTrait {
 

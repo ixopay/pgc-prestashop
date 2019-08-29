@@ -1,12 +1,12 @@
 <?php
 
 
-namespace PaymentGateway\Client\Transaction\Base;
+namespace PaymentGatewayCloud\Client\Transaction\Base;
 
 /**
  * Class AmountableTrait
  *
- * @package PaymentGateway\Client\Transaction\Base
+ * @package PaymentGatewayCloud\Client\Transaction\Base
  */
 trait AmountableTrait {
 

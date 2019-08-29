@@ -6,25 +6,25 @@ if (!defined('_PS_VERSION_')) {
 use PrestaShop\PrestaShop\Core\Payment\PaymentOption;
 
 /**
- * Class PaymentGateway
+ * Class PaymentGatewayCloud
  *
  * @extends PaymentModule
  */
-class PaymentGateway extends PaymentModule
+class PaymentGatewayCloud extends PaymentModule
 {
-    const PAYMENT_GATEWAY_OS_STARTING = 'PAYMENT_GATEWAY_OS_STARTING';
-    const PAYMENT_GATEWAY_OS_AWAITING = 'PAYMENT_GATEWAY_OS_AWAITING';
+    const PAYMENT_GATEWAY_CLOUD_OS_STARTING = 'PAYMENT_GATEWAY_CLOUD_OS_STARTING';
+    const PAYMENT_GATEWAY_CLOUD_OS_AWAITING = 'PAYMENT_GATEWAY_CLOUD_OS_AWAITING';
 
     protected $config_form = false;
 
     public function __construct()
     {
-        require_once(_PS_MODULE_DIR_ . 'paymentgateway' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
+        require_once(_PS_MODULE_DIR_ . 'paymentgatewaycloud' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
-        $this->name = 'paymentgateway';
+        $this->name = 'paymentgatewaycloud';
         $this->tab = 'payments_gateways';
         $this->version = 'X.Y.Z';
-        $this->author = 'Payment Gateway';
+        $this->author = 'Payment Gateway Cloud';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
         $this->is_eu_compatible = 1;
@@ -33,8 +33,8 @@ class PaymentGateway extends PaymentModule
         $this->bootstrap = true;
         parent::__construct();
 
-        $this->displayName = $this->l('Payment Gateway');
-        $this->description = $this->l('Payment Gateway Payment');
+        $this->displayName = $this->l('Payment Gateway Cloud');
+        $this->description = $this->l('Payment Gateway Cloud Payment');
 
         $this->confirmUninstall = $this->l('confirm_uninstall');
 
@@ -57,8 +57,8 @@ class PaymentGateway extends PaymentModule
             return false;
         }
 
-        $this->createOrderState(static::PAYMENT_GATEWAY_OS_STARTING);
-        $this->createOrderState(static::PAYMENT_GATEWAY_OS_AWAITING);
+        $this->createOrderState(static::PAYMENT_GATEWAY_CLOUD_OS_STARTING);
+        $this->createOrderState(static::PAYMENT_GATEWAY_CLOUD_OS_AWAITING);
 
         return true;
     }
@@ -66,10 +66,10 @@ class PaymentGateway extends PaymentModule
     public function uninstall()
     {
         // TODO: delete Configuration
-        // Configuration::deleteByName('PAYMENT_GATEWAY_ENABLED');
-        // Configuration::deleteByName('PAYMENT_GATEWAY_ACCOUNT_USER');
-        // Configuration::deleteByName('PAYMENT_GATEWAY_ACCOUNT_PASSWORD');
-        // Configuration::deleteByName('PAYMENT_GATEWAY_HOST');
+        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_ENABLED');
+        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER');
+        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD');
+        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_HOST');
 
         return parent::uninstall();
     }
@@ -79,7 +79,7 @@ class PaymentGateway extends PaymentModule
      */
     public function getContent()
     {
-        if (((bool)Tools::isSubmit('submitPaymentGatewayModule')) == true) {
+        if (((bool)Tools::isSubmit('submitPaymentGatewayCloudModule')) == true) {
             $form_values = $this->getConfigFormValues();
             foreach (array_keys($form_values) as $key) {
                 $key = str_replace(['[', ']'], '', $key);
@@ -87,7 +87,7 @@ class PaymentGateway extends PaymentModule
                 if (is_array($val)) {
                     $val = \json_encode($val);
                 }
-                if ($key == 'PAYMENT_GATEWAY_HOST') {
+                if ($key == 'PAYMENT_GATEWAY_CLOUD_HOST') {
                     $val = rtrim($val, '/') . '/';
                 }
                 Configuration::updateValue($key, $val);
@@ -113,7 +113,7 @@ class PaymentGateway extends PaymentModule
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG', 0);
 
         $helper->identifier = $this->identifier;
-        $helper->submit_action = 'submitPaymentGatewayModule';
+        $helper->submit_action = 'submitPaymentGatewayCloudModule';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
             . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
@@ -160,7 +160,7 @@ class PaymentGateway extends PaymentModule
                 ],
                 'input' => [
                     [
-                        'name' => 'PAYMENT_GATEWAY_ENABLED',
+                        'name' => 'PAYMENT_GATEWAY_CLOUD_ENABLED',
                         'label' => $this->l('Enable'),
                         'tab' => 'General',
                         'type' => 'switch',
@@ -179,19 +179,19 @@ class PaymentGateway extends PaymentModule
                         ],
                     ],
                     [
-                        'name' => 'PAYMENT_GATEWAY_ACCOUNT_USER',
+                        'name' => 'PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER',
                         'label' => $this->l('User'),
                         'tab' => 'General',
                         'type' => 'text',
                     ],
                     [
-                        'name' => 'PAYMENT_GATEWAY_ACCOUNT_PASSWORD',
+                        'name' => 'PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD',
                         'label' => $this->l('Password'),
                         'tab' => 'General',
                         'type' => 'text',
                     ],
                     [
-                        'name' => 'PAYMENT_GATEWAY_HOST',
+                        'name' => 'PAYMENT_GATEWAY_CLOUD_HOST',
                         'label' => $this->l('Host'),
                         'tab' => 'General',
                         'type' => 'text',
@@ -199,7 +199,7 @@ class PaymentGateway extends PaymentModule
 
                     //                    [
                     //                        'type' => 'select',
-                    //                        'name' => 'PAYMENT_GATEWAY_CC_TYPES[]',
+                    //                        'name' => 'PAYMENT_GATEWAY_CLOUD_CC_TYPES[]',
                     //                        'label' => $this->l('Credit Cards'),
                     //                        'multiple' => true,
                     //                        'options' => [
@@ -233,7 +233,7 @@ class PaymentGateway extends PaymentModule
             ];
 
             $form['form']['input'][] = [
-                'name' => 'PAYMENT_GATEWAY_' . $prefix . '_ENABLED',
+                'name' => 'PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED',
                 'label' => $this->l('Enable'),
                 'tab' => 'CreditCard',
                 'type' => 'switch',
@@ -252,25 +252,25 @@ class PaymentGateway extends PaymentModule
                 ],
             ];
             $form['form']['input'][] = [
-                'name' => 'PAYMENT_GATEWAY_' . $prefix . '_API_KEY',
+                'name' => 'PAYMENT_GATEWAY_CLOUD_' . $prefix . '_API_KEY',
                 'label' => $this->l('API Key'),
                 'tab' => 'CreditCard',
                 'type' => 'text',
             ];
             $form['form']['input'][] = [
-                'name' => 'PAYMENT_GATEWAY_' . $prefix . '_SHARED_SECRET',
+                'name' => 'PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SHARED_SECRET',
                 'label' => $this->l('Shared Secret'),
                 'tab' => 'CreditCard',
                 'type' => 'text',
             ];
             $form['form']['input'][] = [
-                'name' => 'PAYMENT_GATEWAY_' . $prefix . '_INTEGRATION_KEY',
+                'name' => 'PAYMENT_GATEWAY_CLOUD_' . $prefix . '_INTEGRATION_KEY',
                 'label' => $this->l('Integration Key'),
                 'tab' => 'CreditCard',
                 'type' => 'text',
             ];
             $form['form']['input'][] = [
-                'name' => 'PAYMENT_GATEWAY_' . $prefix . '_SEAMLESS',
+                'name' => 'PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SEAMLESS',
                 'label' => $this->l('Seamless Integration'),
                 'tab' => 'CreditCard',
                 'type' => 'switch',
@@ -305,21 +305,21 @@ class PaymentGateway extends PaymentModule
     protected function getConfigFormValues()
     {
         $values = [
-            'PAYMENT_GATEWAY_ENABLED' => Configuration::get('PAYMENT_GATEWAY_ENABLED', null),
-            'PAYMENT_GATEWAY_ACCOUNT_USER' => Configuration::get('PAYMENT_GATEWAY_ACCOUNT_USER', null),
-            'PAYMENT_GATEWAY_ACCOUNT_PASSWORD' => Configuration::get('PAYMENT_GATEWAY_ACCOUNT_PASSWORD', null),
-            'PAYMENT_GATEWAY_HOST' => Configuration::get('PAYMENT_GATEWAY_HOST', null),
-            //            'PAYMENT_GATEWAY_CC_TYPES[]' => json_decode(Configuration::get('PAYMENT_GATEWAY_CC_TYPES', null)),
+            'PAYMENT_GATEWAY_CLOUD_ENABLED' => Configuration::get('PAYMENT_GATEWAY_CLOUD_ENABLED', null),
+            'PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER' => Configuration::get('PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER', null),
+            'PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD' => Configuration::get('PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD', null),
+            'PAYMENT_GATEWAY_CLOUD_HOST' => Configuration::get('PAYMENT_GATEWAY_CLOUD_HOST', null),
+            //            'PAYMENT_GATEWAY_CLOUD_CC_TYPES[]' => json_decode(Configuration::get('PAYMENT_GATEWAY_CLOUD_CC_TYPES', null)),
         ];
 
         foreach ($this->getCreditCards() as $creditCard) {
 
             $prefix = strtoupper($creditCard);
-            $values['PAYMENT_GATEWAY_' . $prefix . '_ENABLED'] = Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_ENABLED', null);
-            $values['PAYMENT_GATEWAY_' . $prefix . '_API_KEY'] = Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_API_KEY', null);
-            $values['PAYMENT_GATEWAY_' . $prefix . '_SHARED_SECRET'] = Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_SHARED_SECRET', null);
-            $values['PAYMENT_GATEWAY_' . $prefix . '_INTEGRATION_KEY'] = Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_INTEGRATION_KEY', null);
-            $values['PAYMENT_GATEWAY_' . $prefix . '_SEAMLESS'] = Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_SEAMLESS', null);
+            $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED', null);
+            $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_API_KEY'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_API_KEY', null);
+            $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SHARED_SECRET'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SHARED_SECRET', null);
+            $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_INTEGRATION_KEY'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_INTEGRATION_KEY', null);
+            $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SEAMLESS'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SEAMLESS', null);
         }
 
         return $values;
@@ -340,7 +340,7 @@ class PaymentGateway extends PaymentModule
 
         $result = [];
 
-        if (!Configuration::get('PAYMENT_GATEWAY_ENABLED', null)) {
+        if (!Configuration::get('PAYMENT_GATEWAY_CLOUD_ENABLED', null)) {
             return;
         }
 
@@ -359,7 +359,7 @@ class PaymentGateway extends PaymentModule
 
             $prefix = strtoupper($creditCard);
 
-            if (!Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_ENABLED', null)) {
+            if (!Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED', null)) {
                 continue;
             }
 
@@ -369,21 +369,21 @@ class PaymentGateway extends PaymentModule
                 ->setCallToActionText($this->l($creditCard))
                 ->setAction($this->context->link->getModuleLink($this->name, 'payment', ['type' => $creditCard], true));
 
-            if (Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_SEAMLESS', null)) {
+            if (Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SEAMLESS', null)) {
 
                 $this->context->smarty->assign([
                     'paymentType' => $creditCard,
                     'id' => bin2hex(random_bytes(10)),
                     'action' => $payment->getAction(),
-                    'integrationKey' => Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_INTEGRATION_KEY', null),
+                    'integrationKey' => Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_INTEGRATION_KEY', null),
                 ]);
 
                 $payment->setInputs([['type' => 'input', 'name' => 'test', 'value' => 'value']]);
 
-                $payment->setForm($this->fetch('module:paymentgateway' . DIRECTORY_SEPARATOR . 'views' .
+                $payment->setForm($this->fetch('module:paymentgatewaycloud' . DIRECTORY_SEPARATOR . 'views' .
                     DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'front' . DIRECTORY_SEPARATOR . 'seamless.tpl'));
 
-                //                $payment->setAdditionalInformation($this->fetch('module:paymentgateway' . DIRECTORY_SEPARATOR . 'views' .
+                //                $payment->setAdditionalInformation($this->fetch('module:paymentgatewaycloud' . DIRECTORY_SEPARATOR . 'views' .
                 //                    DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'front' . DIRECTORY_SEPARATOR . 'seamless.tpl'));
             }
 
@@ -415,7 +415,7 @@ class PaymentGateway extends PaymentModule
     public function hookHeader()
     {
         if ($this->context->controller instanceof OrderControllerCore && $this->context->controller->page_name == 'checkout') {
-            $uri = '/modules/paymentgateway/views/js/front.js';
+            $uri = '/modules/paymentgatewaycloud/views/js/front.js';
             $this->context->controller->registerJavascript(sha1($uri), $uri, ['position' => 'bottom']);
         }
     }
@@ -423,8 +423,8 @@ class PaymentGateway extends PaymentModule
     public function hookDisplayAfterBodyOpeningTag()
     {
         if ($this->context->controller instanceof OrderControllerCore && $this->context->controller->page_name == 'checkout') {
-            $host = Configuration::get('PAYMENT_GATEWAY_HOST', null);
-            return '<script data-main="payment-js" src="' . $host . 'js/integrated/payment.min.js"></script><script>window.paymentGatewayPayment = {};</script>';
+            $host = Configuration::get('PAYMENT_GATEWAY_CLOUD_HOST', null);
+            return '<script data-main="payment-js" src="' . $host . 'js/integrated/payment.min.js"></script><script>window.paymentGatewayCloudPayment = {};</script>';
         }
 
         return null;
@@ -455,17 +455,17 @@ class PaymentGateway extends PaymentModule
             $orderState->name = [];
 
             switch ($stateName) {
-                case self::PAYMENT_GATEWAY_OS_STARTING:
+                case self::PAYMENT_GATEWAY_CLOUD_OS_STARTING:
                     $names = [
-                        'de' => 'Payment Gateway Bezahlung gestartet',
-                        'en' => 'Payment Gateway payment started',
+                        'de' => 'Payment Gateway Cloud Bezahlung gestartet',
+                        'en' => 'Payment Gateway Cloud payment started',
                     ];
                     break;
-                case self::PAYMENT_GATEWAY_OS_AWAITING:
+                case self::PAYMENT_GATEWAY_CLOUD_OS_AWAITING:
                 default:
                     $names = [
-                        'de' => 'Payment Gateway Bezahlung ausständig',
-                        'en' => 'Payment Gateway payment awaiting',
+                        'de' => 'Payment Gateway Cloud Bezahlung ausständig',
+                        'en' => 'Payment Gateway Cloud payment awaiting',
                     ];
                     break;
             }

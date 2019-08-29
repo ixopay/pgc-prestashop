@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Json;
+namespace PaymentGatewayCloud\Client\Json;
 
 /**
  * Class ResponseObject
  *
- * @package PaymentGateway\Client\Json
+ * @package PaymentGatewayCloud\Client\Json
  *
  * @property bool $success
  */

@@ -2,7 +2,7 @@
 /**
  */
 
-class PaymentGatewayCallbackModuleFrontController extends ModuleFrontController
+class PaymentGatewayCloudCallbackModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
@@ -12,12 +12,12 @@ class PaymentGatewayCallbackModuleFrontController extends ModuleFrontController
 
         $notification = Tools::file_get_contents('php://input');
 
-        \PaymentGateway\Client\Client::setApiUrl(Configuration::get('PAYMENT_GATEWAY_HOST', null));
-        $client = new \PaymentGateway\Client\Client(
-            Configuration::get('PAYMENT_GATEWAY_ACCOUNT_USER', null),
-            Configuration::get('PAYMENT_GATEWAY_ACCOUNT_PASSWORD', null),
-            Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_API_KEY', null),
-            Configuration::get('PAYMENT_GATEWAY_' . $prefix . '_SHARED_SECRET', null)
+        \PaymentGatewayCloud\Client\Client::setApiUrl(Configuration::get('PAYMENT_GATEWAY_CLOUD_HOST', null));
+        $client = new \PaymentGatewayCloud\Client\Client(
+            Configuration::get('PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER', null),
+            Configuration::get('PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD', null),
+            Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_API_KEY', null),
+            Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SHARED_SECRET', null)
         );
 
         if (empty($_SERVER['HTTP_DATE']) ||

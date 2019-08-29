@@ -1,14 +1,14 @@
 <?php
 
-namespace PaymentGateway\Client\Data;
+namespace PaymentGatewayCloud\Client\Data;
 
 
-use PaymentGateway\Client\Exception\InvalidValueException;
+use PaymentGatewayCloud\Client\Exception\InvalidValueException;
 
 /**
  * Class IbanCustomer
  *
- * @package PaymentGateway\Client\Data
+ * @package PaymentGatewayCloud\Client\Data
  */
 class IbanCustomer extends Customer {
 

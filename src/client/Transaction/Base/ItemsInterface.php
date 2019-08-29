@@ -1,12 +1,12 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction\Base;
-use PaymentGateway\Client\Data\Item;
+namespace PaymentGatewayCloud\Client\Transaction\Base;
+use PaymentGatewayCloud\Client\Data\Item;
 
 /**
  * Interface ItemsInterface
  *
- * @package PaymentGateway\Client\Transaction\Base
+ * @package PaymentGatewayCloud\Client\Transaction\Base
  */
 interface ItemsInterface {
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\StatusApi;
+namespace PaymentGatewayCloud\Client\StatusApi;
 
-use PaymentGateway\Client\Exception\TypeException;
+use PaymentGatewayCloud\Client\Exception\TypeException;
 
 /**
  * Class StatusRequestData
  *
- * @package PaymentGateway\Client\StatusApi
+ * @package PaymentGatewayCloud\Client\StatusApi
  */
 class StatusRequestData {
 

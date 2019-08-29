@@ -1,6 +1,6 @@
 <?php
 
-namespace PaymentGateway\Prestashop\PaymentMethod;
+namespace PaymentGatewayCloud\Prestashop\PaymentMethod;
 
 interface PaymentMethodInterface
 {

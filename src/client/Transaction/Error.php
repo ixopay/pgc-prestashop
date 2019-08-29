@@ -1,10 +1,10 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction;
+namespace PaymentGatewayCloud\Client\Transaction;
 
 /**
  * Class Error
- * @package PaymentGateway\Client\Transaction
+ * @package PaymentGatewayCloud\Client\Transaction
  */
 class Error {
 

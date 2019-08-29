@@ -9,13 +9,13 @@
         <div class="form-group col-md-6">
             <label class="form-control-label">Firstname</label>
             <div class="">
-                <input type="text" class="form-control" name="ccFirstName" id="payment-gateway-ccFirstName-{$id}" />
+                <input type="text" class="form-control" name="ccFirstName" id="payment-gateway-cloud-ccFirstName-{$id}" />
             </div>
         </div>
         <div class="form-group col-md-6">
             <label class="form-control-label">Lastname</label>
             <div class="">
-                <input type="text" class="form-control" name="ccLastName" id="payment-gateway-ccLastName-{$id}" />
+                <input type="text" class="form-control" name="ccLastName" id="payment-gateway-cloud-ccLastName-{$id}" />
             </div>
         </div>
     </div>
@@ -24,13 +24,13 @@
         <div class="form-group col-md-8">
             <label class="form-control-label">Card Number</label>
             <div class="">
-                <div id="payment-gateway-ccCardNumber-{$id}" style="height: 45px; margin-left: -3px; margin-top: -3px;"></div>
+                <div id="payment-gateway-cloud-ccCardNumber-{$id}" style="height: 45px; margin-left: -3px; margin-top: -3px;"></div>
             </div>
         </div>
         <div class="form-group col-md-4">
             <label class="form-control-label">CVV</label>
             <div class="">
-                <div id="payment-gateway-ccCvv-{$id}" style="height: 45px; margin-left: -3px; margin-top: -3px;"></div>
+                <div id="payment-gateway-cloud-ccCvv-{$id}" style="height: 45px; margin-left: -3px; margin-top: -3px;"></div>
             </div>
         </div>
     </div>
@@ -39,7 +39,7 @@
         <div class="form-group col-md-2">
             <label class="form-control-label">Month</label>
             <div class="">
-                <select class="form-control" name="ccExpiryMonth" id="payment-gateway-ccExpiryMonth-{$id}">
+                <select class="form-control" name="ccExpiryMonth" id="payment-gateway-cloud-ccExpiryMonth-{$id}">
                     {foreach from=$months item=month}
                         <option value="{$month}">{$month}</option>
                     {/foreach}
@@ -49,7 +49,7 @@
         <div class="form-group col-md-3">
             <label class="form-control-label">Year</label>
             <div class="">
-                <select class="form-control" name="ccExpiryYear" id="payment-gateway-ccExpiryYear-{$id}">
+                <select class="form-control" name="ccExpiryYear" id="payment-gateway-cloud-ccExpiryYear-{$id}">
                     {foreach from=$years item=year}
                         <option value="{$year}">{$year}</option>
                     {/foreach}
@@ -65,7 +65,7 @@
     var id = '{/literal}{$id}{literal}';
 
     var payment = new PaymentJs("1.2");
-    payment.init({/literal}'{$integrationKey}', 'payment-gateway-ccCardNumber-{$id}', 'payment-gateway-ccCvv-{$id}'{literal}, function(payment) {
+    payment.init({/literal}'{$integrationKey}', 'payment-gateway-cloud-ccCardNumber-{$id}', 'payment-gateway-cloud-ccCvv-{$id}'{literal}, function(payment) {
         var style = {
             'background': '#f1f1f1',
             'color': '#7a7a7a',
@@ -108,6 +108,6 @@
         });
     });
 
-    window.paymentGatewayPayment[id] = payment;
+    window.paymentGatewayCloudCloudPayment[id] = payment;
 </script>
 {/literal}

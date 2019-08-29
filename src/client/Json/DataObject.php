@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Json;
+namespace PaymentGatewayCloud\Client\Json;
 
 /**
  * Class DataObject
  *
- * @package PaymentGateway\Client\Json
+ * @package PaymentGatewayCloud\Client\Json
  */
 class DataObject implements \ArrayAccess, \JsonSerializable {
 
@@ -15,11 +15,11 @@ class DataObject implements \ArrayAccess, \JsonSerializable {
     protected $_data = array();
 
     protected static $_typeMap = array(
-        'customerData' => \PaymentGateway\Client\CustomerProfile\CustomerData::class,
-        'paymentInstrument' => \PaymentGateway\Client\CustomerProfile\PaymentInstrument::class,
-        'paymentData.card' => \PaymentGateway\Client\CustomerProfile\PaymentData\CardData::class,
-        'paymentData.iban' => \PaymentGateway\Client\CustomerProfile\PaymentData\IbanData::class,
-        'paymentData.wallet' => \PaymentGateway\Client\CustomerProfile\PaymentData\WalletData::class,
+        'customerData' => \PaymentGatewayCloud\Client\CustomerProfile\CustomerData::class,
+        'paymentInstrument' => \PaymentGatewayCloud\Client\CustomerProfile\PaymentInstrument::class,
+        'paymentData.card' => \PaymentGatewayCloud\Client\CustomerProfile\PaymentData\CardData::class,
+        'paymentData.iban' => \PaymentGatewayCloud\Client\CustomerProfile\PaymentData\IbanData::class,
+        'paymentData.wallet' => \PaymentGatewayCloud\Client\CustomerProfile\PaymentData\WalletData::class,
     );
 
     /**

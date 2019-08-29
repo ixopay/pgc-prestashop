@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Schedule;
+namespace PaymentGatewayCloud\Client\Schedule;
 
 /**
  * Class ScheduleError
  *
- * @package PaymentGateway\Client\Schedule
+ * @package PaymentGatewayCloud\Client\Schedule
  */
 class ScheduleError {
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\Http;
+namespace PaymentGatewayCloud\Client\Http;
 
-use PaymentGateway\Client\Http\Exception\ResponseException;
+use PaymentGatewayCloud\Client\Http\Exception\ResponseException;
 
 /**
  * Class Response
  *
- * @package PaymentGateway\Client\Http
+ * @package PaymentGatewayCloud\Client\Http
  */
 class Response implements ResponseInterface {
 

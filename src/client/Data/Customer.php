@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Data;
+namespace PaymentGatewayCloud\Client\Data;
 
 /**
  * Represents a generic customer without any specific data.
  *
- * @package PaymentGateway\Client\Data
+ * @package PaymentGatewayCloud\Client\Data
  */
 class Customer extends Data {
 

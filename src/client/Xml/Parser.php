@@ -1,28 +1,28 @@
 <?php
 
-namespace PaymentGateway\Client\Xml;
+namespace PaymentGatewayCloud\Client\Xml;
 
-use PaymentGateway\Client\Callback\ChargebackData;
-use PaymentGateway\Client\Callback\ChargebackReversalData;
-use PaymentGateway\Client\Data\Customer;
-use PaymentGateway\Client\Data\Result\CreditcardData;
-use PaymentGateway\Client\Data\Result\IbanData;
-use PaymentGateway\Client\Data\Result\PhoneData;
-use PaymentGateway\Client\Data\Result\ResultData;
-use PaymentGateway\Client\Data\Result\WalletData;
-use PaymentGateway\Client\Exception\ClientException;
-use PaymentGateway\Client\Schedule\ScheduleResult;
-use PaymentGateway\Client\Exception\InvalidValueException;
-use PaymentGateway\Client\Schedule\ScheduleError;
-use PaymentGateway\Client\StatusApi\StatusResult;
-use PaymentGateway\Client\Transaction\Error;
-use PaymentGateway\Client\Transaction\Result;
-use PaymentGateway\Client\Callback\Result as CallbackResult;
+use PaymentGatewayCloud\Client\Callback\ChargebackData;
+use PaymentGatewayCloud\Client\Callback\ChargebackReversalData;
+use PaymentGatewayCloud\Client\Data\Customer;
+use PaymentGatewayCloud\Client\Data\Result\CreditcardData;
+use PaymentGatewayCloud\Client\Data\Result\IbanData;
+use PaymentGatewayCloud\Client\Data\Result\PhoneData;
+use PaymentGatewayCloud\Client\Data\Result\ResultData;
+use PaymentGatewayCloud\Client\Data\Result\WalletData;
+use PaymentGatewayCloud\Client\Exception\ClientException;
+use PaymentGatewayCloud\Client\Schedule\ScheduleResult;
+use PaymentGatewayCloud\Client\Exception\InvalidValueException;
+use PaymentGatewayCloud\Client\Schedule\ScheduleError;
+use PaymentGatewayCloud\Client\StatusApi\StatusResult;
+use PaymentGatewayCloud\Client\Transaction\Error;
+use PaymentGatewayCloud\Client\Transaction\Result;
+use PaymentGatewayCloud\Client\Callback\Result as CallbackResult;
 
 /**
  * Class Parser
  *
- * @package PaymentGateway\Client\Xml
+ * @package PaymentGatewayCloud\Client\Xml
  */
 class Parser {
 

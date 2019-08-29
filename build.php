@@ -1,8 +1,35 @@
 <?php
+/**
+ * extension source version
+ */
 $version = '1.0.0';
-$placeholderName = 'Payment Gateway';
-$name = $argv[1] ?? null;
-$domain = $argv[2] ?? null;
+
+/**
+ * dist filename
+ */
+$distFilenamePrefix = 'prestashop-';
+$distFilenameSuffix = '';
+
+/**
+ * path within zip file
+ * set to false to have source at the root of the zip file
+ * a requirement in some systems to make the zip file installable
+ * others require it to be lowercase without special characters
+ */
+// $distFilenameRootDirName = false;
+
+/**
+ * Dragons below
+ * Do not change
+ */
+
+/**
+ * build config
+ */
+$placeholderName = 'Payment Gateway Cloud';
+$hostname = $argv[1] ?? null;
+$name = $argv[2] ?? null;
+$debug = strpos(implode(' ', $argv), ' --debug') !== false;
 $srcDir = 'src';
 $buildDir = 'build';
 $distDir = 'dist';
@@ -13,7 +40,7 @@ highlight('Whitelabel Build Script');
 /**
  * check workspace
  */
-if (!file_exists($srcDir)) {
+if (!realpath($srcDir)) {
     line();
     error('Source directory does not exist');
     exit;
@@ -32,72 +59,81 @@ if (empty($name)) {
 /**
  * validate domain input
  */
-$domain = filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME);
-if (empty($domain)) {
+$hostname = filter_var($hostname, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME);
+if (empty($hostname)) {
     line();
-    error('Domain must not be empty');
+    error('Host name must be valid');
     usage();
     exit;
 }
 
 /**
+ * the zip file's name without extension
+ */
+$distFilename = $distFilenamePrefix . kebabCase($name) . '-' . $version . $distFilenameSuffix;
+line('    '.$distFilename);
+
+/**
+ * relative path within zip file
+ */
+$distFilenameRootDirName = ($distFilenameRootDirName ?? true) === false ? '' : identifierCase($name);
+
+/**
  * create replacement map
  */
-$composerHashPrefix = md5(identifierCase($name) . '-' . $version);
 $replacementMap = [
-    // "Payment Gateway" -> "My Provider"
-    $placeholderName => $name,
-    // "PaymentGateway" -> "MyProvider" (namespaces and other identifiers)
-    pascalCase($placeholderName) => pascalCase($name),
-    // "paymentGateway" -> "myProvider"
-    camelCase($placeholderName) => camelCase($name),
-    // "paymentgateway" -> "myprovider"
-    identifierCase($placeholderName) => identifierCase($name),
-    // "payment-gateway" -> "my-provider"
-    kebabCase($placeholderName) => kebabCase($name),
-    // "payment_gateway" -> "my_provider"
-    snakeCase($placeholderName) => snakeCase($name),
-    // "PAYMENT_GATEWAY -> "MY_PROVIDER" (constants)
-    constantCase($placeholderName) => constantCase($name),
-    // "gateway.paymentgateway.cloud" -> "gateway.myprovider.com" (client xml namespace and endpoints)
-    'gateway.paymentgateway.cloud' => $domain,
     // X.Y.Z -> 1.1.0
     'X.Y.Z' => $version,
-    /**
-     * Prefix composer autoloader names with a unique hash.
-     * This prevents conflicts in case two whitelabel plugins, which were both
-     * built from the same version of the source, are installed at the same time.
-     */
-    'ComposerStaticInit' => 'ComposerStaticInit' . $composerHashPrefix,
-    'ComposerAutoloaderInit' => 'ComposerAutoloaderInit' . $composerHashPrefix,
+    // "gateway.paymentgateway.cloud" -> "gateway.myprovider.com" (client xml namespace and endpoints)
+    'gateway.paymentgateway.cloud' => $hostname,
+    // "Payment Gateway Cloud" -> "My Provider"
+    $placeholderName => $name,
+    // "PaymentGatewayCloud" -> "MyProvider" (namespaces and other identifiers)
+    pascalCase($placeholderName) => pascalCase($name),
+    // "paymentGatewayCloud" -> "myProvider"
+    camelCase($placeholderName) => camelCase($name),
+    // "paymentgatewaycloud" -> "myprovider"
+    identifierCase($placeholderName) => identifierCase($name),
+    // "payment-gateway-cloud" -> "my-provider"
+    kebabCase($placeholderName) => kebabCase($name),
+    // "payment_gateway_cloud" -> "my_provider"
+    snakeCase($placeholderName) => snakeCase($name),
+    // "PAYMENT_GATEWAY_CLOUD" -> "MY_PROVIDER" (constants)
+    constantCase($placeholderName) => constantCase($name),
 ];
 
 /**
  * print replacement map and prompt user if planned changes are ok
  */
 line();
+info('Replacements for file/folder names and contents:');
 foreach ($replacementMap as $old => $new) {
     line('    ' . $old . ' => ' . $new);
 }
 line();
-prompt('OK?');
+prompt('This will clear any existing "' . $buildDir . '" folder and start the build. OK?');
 
 /**
- * clear existing build folder
+ * Prefix composer autoloader names with a unique hash.
+ * This prevents conflicts in case two whitelabel plugins, which were both
+ * built from the same version of the source, are installed at the same time.
  */
-if (file_exists($buildDir)) {
-    deleteDir($buildDir);
-    info('Cleared build directory');
-}
+$composerHashPrefix = md5(identifierCase($name) . '-' . $version);
+$replacementMap = array_merge($replacementMap, [
+    'ComposerStaticInit' => 'ComposerStaticInit' . $composerHashPrefix,
+    'ComposerAutoloaderInit' => 'ComposerAutoloaderInit' . $composerHashPrefix,
+]);
 
 /**
  * build
- * copy source to build folder, clear existing if applicable
+ * clear existing build folder
+ * copy source to build folder
  * applies replacement map to folder names, file names and file contents while at it
  */
+deleteDir($buildDir);
 info('Building...');
 build($srcDir, $buildDir, $replacementMap);
-success('Done');
+success('Build complete');
 
 /**
  * create dist folder if needed
@@ -111,8 +147,7 @@ if (!file_exists($distDir)) {
  * zip build to myprovider.zip
  */
 info('Creating zip file...');
-zipBuildToDist($buildDir, $distDir, identifierCase($name) . '-' . $version, identifierCase($name));
-success('Done');
+zipBuildToDist($buildDir, $distDir, $distFilename, $distFilenameRootDirName);
 
 exit;
 
@@ -125,8 +160,8 @@ exit;
  */
 function usage()
 {
-    warn('Usage: php build.php [name] [domain]');
-    line('Example: php build.php "My Payment Provider" gateway.mypaymentprovider.com');
+    warn('Usage: php build.php [hostname] [name]');
+    line('Example: php build.php gateway.mypaymentprovider.com "My Payment Provider"');
     line();
 }
 
@@ -237,7 +272,10 @@ function highlight($message)
  */
 function debug($message)
 {
-    echo "[SUCCESS] " . $message . "\n";
+    global $debug;
+    if ($debug) {
+        echo "\e[1;33m[DEBUG] " . $message . "\e[0m\n";
+    }
 }
 
 /**
@@ -262,6 +300,8 @@ function prompt($message)
  */
 function build($src, $dst, $replacementMap = [])
 {
+    debug('Scan "' . $src . '"');
+
     $dir = opendir($src);
     @mkdir($dst);
     while (false !== ($file = readdir($dir))) {
@@ -271,7 +311,9 @@ function build($src, $dst, $replacementMap = [])
             if (is_dir($srcFile)) {
                 build($srcFile, $destFile, $replacementMap);
             } else {
+                debug('Copy "' . $destFile . '" -> "' . $destFile . '"');
                 copy($srcFile, $destFile);
+                debug('Process "' . $destFile . '"');
                 replaceContents($destFile, $replacementMap);
             }
         }
@@ -306,11 +348,33 @@ function applyReplacements($string, $replacementMap)
  */
 function deleteDir($dir)
 {
-    if (empty($dir)) {
+    $dir = sanitizeDirInput($dir);
+
+    $dirPath = realpath(__DIR__ . '/' . $dir);
+
+    if (!$dirPath) {
         return;
     }
-    $dir = './' . $dir;
-    $it = new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS);
+
+    /**
+     * do not allow to delete this script's parent directory
+     */
+    if ($dirPath == __DIR__) {
+        error('Deleting directory "' . $dir . '" is not allowed');
+        exit;
+    }
+
+    /**
+     * do not allow to delete any path that is not within this script's parent directory
+     */
+    if (strpos($dirPath, __DIR__) !== 0) {
+        error('Deleting directory "' . $dir . '" is not allowed');
+        exit;
+    }
+
+    warn('Deleting ' . $dirPath);
+
+    $it = new RecursiveDirectoryIterator($dirPath, RecursiveDirectoryIterator::SKIP_DOTS);
     $files = new RecursiveIteratorIterator($it,
         RecursiveIteratorIterator::CHILD_FIRST);
     foreach ($files as $file) {
@@ -320,42 +384,64 @@ function deleteDir($dir)
             unlink($file->getRealPath());
         }
     }
-    rmdir($dir);
+    rmdir($dirPath);
 }
 
 /**
- * @param string $dir
- * @param string $destFile
+ * @param string $srcDir
+ * @param string $destDir
+ * @param string $filename
+ * @param string $rootDirectoryName the root directory's name within the zip file
  */
-function zipBuildToDist($srcDir, $destDir, $filename, $directoryName)
+function zipBuildToDist($srcDir, $destDir, $filename, $rootDirectoryName)
 {
-    // Get real path for our folder
-    $rootPath = realpath($srcDir);
+    $srcDir = sanitizeDirInput($srcDir);
+    $destDir = sanitizeDirInput($destDir);
 
-    // Initialize archive object
+    $srcDirPath = realpath($srcDir);
+    $destDirPath = realpath($destDir);
+
+    $zipFilename = $filename . '.zip';
+
     $zip = new ZipArchive();
-    $zip->open($destDir . '/' . $filename . '.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+    $zip->open($destDirPath . '/' . $zipFilename, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
-    // Create recursive directory iterator
     /** @var SplFileInfo[] $files */
     $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($rootPath),
+        new RecursiveDirectoryIterator($srcDirPath),
         RecursiveIteratorIterator::LEAVES_ONLY
     );
+
     foreach ($files as $name => $file) {
-
-        // Skip directories (they would be added automatically)
+        /**
+         * Skip directories (they would be added automatically)
+         */
         if (!$file->isDir()) {
-
-            // Get real and relative path for current file
+            /**
+             * Get real and relative path for current file
+             */
             $filePath = $file->getRealPath();
-            $relativePath = $directoryName . '/' . substr($filePath, strlen($rootPath) + 1);
+            $relativePath = substr($filePath, strlen($srcDirPath) + 1);
 
-            // Add current file to archive
-            $zip->addFile($filePath, $relativePath);
+            $zip->addFile($filePath, $rootDirectoryName . '/' . $relativePath);
         }
     }
 
-    // Zip archive will be created only after closing object
+    /**
+     * Zip archive will be created after closing object
+     */
     $zip->close();
+
+    success('Created file "' . $destDir . '/' . $zipFilename . '"');
+}
+
+/**
+ * do not allow to reference a directory outside of this script's path
+ *
+ * @param string $dir
+ * @return string
+ */
+function sanitizeDirInput($dir)
+{
+    return ltrim(str_replace('../', '', $dir), '/');
 }

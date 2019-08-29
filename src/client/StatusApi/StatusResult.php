@@ -1,16 +1,16 @@
 <?php
 
-namespace PaymentGateway\Client\StatusApi;
+namespace PaymentGatewayCloud\Client\StatusApi;
 
-use PaymentGateway\Client\Callback\ChargebackData;
-use PaymentGateway\Client\Callback\ChargebackReversalData;
-use PaymentGateway\Client\Data\Customer;
-use PaymentGateway\Client\Data\Result\ResultData;
-use PaymentGateway\Client\Transaction\Error;
+use PaymentGatewayCloud\Client\Callback\ChargebackData;
+use PaymentGatewayCloud\Client\Callback\ChargebackReversalData;
+use PaymentGatewayCloud\Client\Data\Customer;
+use PaymentGatewayCloud\Client\Data\Result\ResultData;
+use PaymentGatewayCloud\Client\Transaction\Error;
 
 /**
  *
- * @package PaymentGateway\Client\StatusApi
+ * @package PaymentGatewayCloud\Client\StatusApi
  */
 class StatusResult {
 

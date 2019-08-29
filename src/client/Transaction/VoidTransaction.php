@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction;
+namespace PaymentGatewayCloud\Client\Transaction;
 
-use PaymentGateway\Client\Transaction\Base\AbstractTransactionWithReference;
+use PaymentGatewayCloud\Client\Transaction\Base\AbstractTransactionWithReference;
 
 /**
  * Void: Revert a previously preauthorized transaction.
  *
- * @package PaymentGateway\Client\Transaction
+ * @package PaymentGatewayCloud\Client\Transaction
  */
 class VoidTransaction extends AbstractTransactionWithReference {
 

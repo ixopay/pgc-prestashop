@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\CustomerProfile;
+namespace PaymentGatewayCloud\Client\CustomerProfile;
 
-use PaymentGateway\Client\Json\ResponseObject;
+use PaymentGatewayCloud\Client\Json\ResponseObject;
 
 /**
  * Class GetProfileResponse
  *
- * @package PaymentGateway\Client\CustomerProfile
+ * @package PaymentGatewayCloud\Client\CustomerProfile
  *
  * @property bool $profileExists
  * @property string $profileGuid

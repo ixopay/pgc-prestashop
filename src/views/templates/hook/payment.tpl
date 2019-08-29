@@ -25,16 +25,16 @@
 
 <div class="row">
 	<div class="col-xs-12 col-md-6">
-		<p class="payment_module" id="payment_gateway_payment_button">
+		<p class="payment_module" id="payment_gateway_cloud_payment_button">
 			{if $cart->getOrderTotal() < 2}
 				<a href="">
-					<img src="{$domain|cat:$payment_button|escape:'html':'UTF-8'}" alt="{l s='Pay with my payment module' mod='PaymentGateway'}" />
-					{l s='Minimum amount required in order to pay with my payment module:' mod='PaymentGateway'} {convertPrice price=2}
+					<img src="{$domain|cat:$payment_button|escape:'html':'UTF-8'}" alt="{l s='Pay with my payment module' mod='PaymentGatewayCloud'}" />
+					{l s='Minimum amount required in order to pay with my payment module:' mod='PaymentGatewayCloud'} {convertPrice price=2}
 				</a>
 			{else}
-				<a href="{$link->getModuleLink('PaymentGateway', 'redirect', array(), true)|escape:'htmlall':'UTF-8'}" title="{l s='Pay with my payment module' mod='PaymentGateway'}">
-					<img src="{$module_dir|escape:'htmlall':'UTF-8'}/logo.png" alt="{l s='Pay with my payment module' mod='PaymentGateway'}" width="32" height="32" />
-					{l s='Pay with my payment module' mod='PaymentGateway'}
+				<a href="{$link->getModuleLink('PaymentGatewayCloud', 'redirect', array(), true)|escape:'htmlall':'UTF-8'}" title="{l s='Pay with my payment module' mod='PaymentGatewayCloud'}">
+					<img src="{$module_dir|escape:'htmlall':'UTF-8'}/logo.png" alt="{l s='Pay with my payment module' mod='PaymentGatewayCloud'}" width="32" height="32" />
+					{l s='Pay with my payment module' mod='PaymentGatewayCloud'}
 				</a>
 			{/if}
 		</p>

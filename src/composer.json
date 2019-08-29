@@ -1,5 +1,5 @@
 {
-  "name": "payment-gateway/payment-gateway-prestashop",
+  "name": "payment-gateway-cloud/payment-gateway-cloud-prestashop",
   "description": "",
   "type": "prestashop-plugin",
   "license": "",
@@ -8,9 +8,9 @@
   },
   "autoload": {
     "psr-4": {
-      "PaymentGateway\\Prestashop\\PaymentMethod\\": "./payment_method/",
-      "PaymentGateway\\Prestashop\\": "./",
-      "PaymentGateway\\Client\\": "./client/"
+      "PaymentGatewayCloud\\Prestashop\\PaymentMethod\\": "./payment_method/",
+      "PaymentGatewayCloud\\Prestashop\\": "./",
+      "PaymentGatewayCloud\\Client\\": "./client/"
     }
   },
   "config": {

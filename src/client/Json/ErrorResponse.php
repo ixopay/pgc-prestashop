@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Json;
+namespace PaymentGatewayCloud\Client\Json;
 
 /**
  * Class ErrorResponse
  *
- * @package PaymentGateway\Client\Json
+ * @package PaymentGatewayCloud\Client\Json
  *
  * @property string $errorMessage
  * @property int $errorCode

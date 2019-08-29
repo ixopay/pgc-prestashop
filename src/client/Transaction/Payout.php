@@ -1,17 +1,17 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction;
+namespace PaymentGatewayCloud\Client\Transaction;
 
-use PaymentGateway\Client\Transaction\Base\AbstractTransactionWithReference;
-use PaymentGateway\Client\Transaction\Base\AmountableInterface;
-use PaymentGateway\Client\Transaction\Base\AmountableTrait;
-use PaymentGateway\Client\Transaction\Base\ItemsInterface;
-use PaymentGateway\Client\Transaction\Base\ItemsTrait;
+use PaymentGatewayCloud\Client\Transaction\Base\AbstractTransactionWithReference;
+use PaymentGatewayCloud\Client\Transaction\Base\AmountableInterface;
+use PaymentGatewayCloud\Client\Transaction\Base\AmountableTrait;
+use PaymentGatewayCloud\Client\Transaction\Base\ItemsInterface;
+use PaymentGatewayCloud\Client\Transaction\Base\ItemsTrait;
 
 /**
  * Payout: Payout a certain amount of money to the customer. (Debits the merchant's account, Credits the customer's account)
  *
- * @package PaymentGateway\Client\Transaction
+ * @package PaymentGatewayCloud\Client\Transaction
  */
 class Payout extends AbstractTransactionWithReference implements AmountableInterface, ItemsInterface {
     use ItemsTrait;
