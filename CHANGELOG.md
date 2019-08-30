@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Unreleased
+
+## v1.0.1 (2019-08-30)
 ### Changed
 - Improved build stability
 
