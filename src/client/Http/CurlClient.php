@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\Http;
+namespace PaymentGatewayCloud\Client\Http;
 
-use PaymentGateway\Client\Http\Exception\ClientException;
+use PaymentGatewayCloud\Client\Http\Exception\ClientException;
 
 /**
  * Class CurlClient
  *
- * @package PaymentGateway\Client\Http
+ * @package PaymentGatewayCloud\Client\Http
  */
 class CurlClient implements ClientInterface {
 

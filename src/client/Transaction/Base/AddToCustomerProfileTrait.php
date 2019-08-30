@@ -1,10 +1,10 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction\Base;
+namespace PaymentGatewayCloud\Client\Transaction\Base;
 
 /**
  * Trait AddToCustomerProfileTrait
- * @package PaymentGateway\Client\Transaction\Base
+ * @package PaymentGatewayCloud\Client\Transaction\Base
  */
 trait AddToCustomerProfileTrait {
 

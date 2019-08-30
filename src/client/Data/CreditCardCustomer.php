@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Data;
+namespace PaymentGatewayCloud\Client\Data;
 
 /**
  * Specialized class to represent a customer with credit card data.
  *
- * @package PaymentGateway\Client\Data
+ * @package PaymentGatewayCloud\Client\Data
  */
 class CreditCardCustomer extends Customer {
 

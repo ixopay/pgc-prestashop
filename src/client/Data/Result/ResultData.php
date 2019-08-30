@@ -1,12 +1,12 @@
 <?php
 
 
-namespace PaymentGateway\Client\Data\Result;
+namespace PaymentGatewayCloud\Client\Data\Result;
 
 /**
  * Class ResultData
  *
- * @package PaymentGateway\Client\Data\Result
+ * @package PaymentGatewayCloud\Client\Data\Result
  */
 abstract class ResultData {
 

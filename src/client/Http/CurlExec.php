@@ -1,12 +1,12 @@
 <?php
 
 
-namespace PaymentGateway\Client\Http;
+namespace PaymentGatewayCloud\Client\Http;
 
 /**
  * Class CurlExec
  *
- * @package PaymentGateway\Client\Http
+ * @package PaymentGatewayCloud\Client\Http
  */
 class CurlExec {
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\CustomerProfile\PaymentData;
+namespace PaymentGatewayCloud\Client\CustomerProfile\PaymentData;
 
-use PaymentGateway\Client\Json\DataObject;
+use PaymentGatewayCloud\Client\Json\DataObject;
 
 /**
  * Class PaymentData
  *
- * @package PaymentGateway\Client\CustomerProfile\PaymentData
+ * @package PaymentGatewayCloud\Client\CustomerProfile\PaymentData
  */
 abstract class PaymentData extends DataObject {
 

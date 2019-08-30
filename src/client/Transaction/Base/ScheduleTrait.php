@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction\Base;
+namespace PaymentGatewayCloud\Client\Transaction\Base;
 
-use PaymentGateway\Client\Schedule\ScheduleData;
+use PaymentGatewayCloud\Client\Schedule\ScheduleData;
 
 /**
  * Trait ScheduleTrait
  *
- * @package PaymentGateway\Client\Transaction\Base
+ * @package PaymentGatewayCloud\Client\Transaction\Base
  */
 trait ScheduleTrait {
 

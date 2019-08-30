@@ -1,34 +1,34 @@
 <?php
 
-namespace PaymentGateway\Client\Xml;
+namespace PaymentGatewayCloud\Client\Xml;
 
-use PaymentGateway\Client\Data\CreditCardCustomer;
-use PaymentGateway\Client\Data\Customer;
-use PaymentGateway\Client\Data\IbanCustomer;
-use PaymentGateway\Client\Data\Request;
-use PaymentGateway\Client\Exception\InvalidValueException;
-use PaymentGateway\Client\Schedule\ScheduleData;
-use PaymentGateway\Client\Exception\TypeException;
-use PaymentGateway\Client\StatusApi\StatusRequestData;
-use PaymentGateway\Client\Transaction\Base\AbstractTransaction;
-use PaymentGateway\Client\Transaction\Base\AbstractTransactionWithReference;
-use PaymentGateway\Client\Transaction\Base\AmountableInterface;
-use PaymentGateway\Client\Transaction\Base\ItemsInterface;
-use PaymentGateway\Client\Transaction\Base\OffsiteInterface;
-use PaymentGateway\Client\Transaction\Capture;
-use PaymentGateway\Client\Transaction\Debit;
-use PaymentGateway\Client\Transaction\Deregister;
-use PaymentGateway\Client\Transaction\Payout;
-use PaymentGateway\Client\Transaction\Preauthorize;
-use PaymentGateway\Client\Transaction\Refund;
-use PaymentGateway\Client\Transaction\Register;
-use PaymentGateway\Client\Transaction\VoidTransaction;
-use PaymentGateway\Client\Transaction\Base\AddToCustomerProfileInterface;
+use PaymentGatewayCloud\Client\Data\CreditCardCustomer;
+use PaymentGatewayCloud\Client\Data\Customer;
+use PaymentGatewayCloud\Client\Data\IbanCustomer;
+use PaymentGatewayCloud\Client\Data\Request;
+use PaymentGatewayCloud\Client\Exception\InvalidValueException;
+use PaymentGatewayCloud\Client\Schedule\ScheduleData;
+use PaymentGatewayCloud\Client\Exception\TypeException;
+use PaymentGatewayCloud\Client\StatusApi\StatusRequestData;
+use PaymentGatewayCloud\Client\Transaction\Base\AbstractTransaction;
+use PaymentGatewayCloud\Client\Transaction\Base\AbstractTransactionWithReference;
+use PaymentGatewayCloud\Client\Transaction\Base\AmountableInterface;
+use PaymentGatewayCloud\Client\Transaction\Base\ItemsInterface;
+use PaymentGatewayCloud\Client\Transaction\Base\OffsiteInterface;
+use PaymentGatewayCloud\Client\Transaction\Capture;
+use PaymentGatewayCloud\Client\Transaction\Debit;
+use PaymentGatewayCloud\Client\Transaction\Deregister;
+use PaymentGatewayCloud\Client\Transaction\Payout;
+use PaymentGatewayCloud\Client\Transaction\Preauthorize;
+use PaymentGatewayCloud\Client\Transaction\Refund;
+use PaymentGatewayCloud\Client\Transaction\Register;
+use PaymentGatewayCloud\Client\Transaction\VoidTransaction;
+use PaymentGatewayCloud\Client\Transaction\Base\AddToCustomerProfileInterface;
 
 /**
  * Class Generator
  *
- * @package PaymentGateway\Client\Xml
+ * @package PaymentGatewayCloud\Client\Xml
  */
 class Generator {
 
@@ -635,7 +635,7 @@ class Generator {
     }
 
     /**
-     * @param \PaymentGateway\Client\Transaction\VoidTransaction $transaction
+     * @param \PaymentGatewayCloud\Client\Transaction\VoidTransaction $transaction
      * @param $method
      *
      * @return \DOMElement

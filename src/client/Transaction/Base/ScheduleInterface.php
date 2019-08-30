@@ -1,8 +1,8 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction\Base;
+namespace PaymentGatewayCloud\Client\Transaction\Base;
 
-use PaymentGateway\Client\Schedule\ScheduleData;
+use PaymentGatewayCloud\Client\Schedule\ScheduleData;
 
 interface ScheduleInterface {
 

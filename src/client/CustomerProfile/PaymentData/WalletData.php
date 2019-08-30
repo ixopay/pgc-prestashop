@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\CustomerProfile\PaymentData;
+namespace PaymentGatewayCloud\Client\CustomerProfile\PaymentData;
 
 /**
  * Class WalletData
  *
- * @package PaymentGateway\Client\CustomerProfile\PaymentData
+ * @package PaymentGatewayCloud\Client\CustomerProfile\PaymentData
  *
  * @property string $walletReferenceId
  * @property string $walletOwner

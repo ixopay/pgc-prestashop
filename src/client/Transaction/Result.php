@@ -1,14 +1,14 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction;
+namespace PaymentGatewayCloud\Client\Transaction;
 
-use PaymentGateway\Client\Data\Customer;
-use PaymentGateway\Client\Data\Result\ResultData;
+use PaymentGatewayCloud\Client\Data\Customer;
+use PaymentGatewayCloud\Client\Data\Result\ResultData;
 
 /**
  * Class Result
  *
- * @package PaymentGateway\Client\Transaction
+ * @package PaymentGatewayCloud\Client\Transaction
  */
 class Result {
 
@@ -385,14 +385,14 @@ class Result {
     /**
      * contains additional data for your purpose (e.g. credit card information)
      *
-     * @return \PaymentGateway\Client\Data\Result\ResultData
+     * @return \PaymentGatewayCloud\Client\Data\Result\ResultData
      */
     public function getReturnData() {
         return $this->returnData;
     }
 
     /**
-     * @param \PaymentGateway\Client\Data\Result\ResultData $returnData
+     * @param \PaymentGatewayCloud\Client\Data\Result\ResultData $returnData
      *
      * @return $this
      */

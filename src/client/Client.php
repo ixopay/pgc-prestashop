@@ -1,40 +1,40 @@
 <?php
 
-namespace PaymentGateway\Client;
+namespace PaymentGatewayCloud\Client;
 
-use PaymentGateway\Client\CustomerProfile\CustomerData;
-use PaymentGateway\Client\CustomerProfile\DeleteProfileResponse;
-use PaymentGateway\Client\CustomerProfile\GetProfileResponse;
-use PaymentGateway\Client\CustomerProfile\PaymentInstrument;
-use PaymentGateway\Client\CustomerProfile\UpdateProfileResponse;
-use PaymentGateway\Client\Json\ErrorResponse;
-use PaymentGateway\Client\Exception\RateLimitException;
-use PaymentGateway\Client\Schedule\ScheduleData;
-use PaymentGateway\Client\Exception\ClientException;
-use PaymentGateway\Client\Exception\InvalidValueException;
-use PaymentGateway\Client\Exception\TimeoutException;
-use PaymentGateway\Client\Http\CurlClient;
-use PaymentGateway\Client\Http\Response;
-use PaymentGateway\Client\StatusApi\StatusRequestData;
-use PaymentGateway\Client\Transaction\Base\AbstractTransaction;
-use PaymentGateway\Client\Transaction\Capture;
-use PaymentGateway\Client\Transaction\Debit;
-use PaymentGateway\Client\Transaction\Deregister;
-use PaymentGateway\Client\Transaction\Payout;
-use PaymentGateway\Client\Transaction\Preauthorize;
-use PaymentGateway\Client\Transaction\Refund;
-use PaymentGateway\Client\Transaction\Register;
-use PaymentGateway\Client\Transaction\Result;
-use PaymentGateway\Client\Transaction\VoidTransaction;
-use PaymentGateway\Client\Xml\Generator;
-use PaymentGateway\Client\Xml\Parser;
+use PaymentGatewayCloud\Client\CustomerProfile\CustomerData;
+use PaymentGatewayCloud\Client\CustomerProfile\DeleteProfileResponse;
+use PaymentGatewayCloud\Client\CustomerProfile\GetProfileResponse;
+use PaymentGatewayCloud\Client\CustomerProfile\PaymentInstrument;
+use PaymentGatewayCloud\Client\CustomerProfile\UpdateProfileResponse;
+use PaymentGatewayCloud\Client\Json\ErrorResponse;
+use PaymentGatewayCloud\Client\Exception\RateLimitException;
+use PaymentGatewayCloud\Client\Schedule\ScheduleData;
+use PaymentGatewayCloud\Client\Exception\ClientException;
+use PaymentGatewayCloud\Client\Exception\InvalidValueException;
+use PaymentGatewayCloud\Client\Exception\TimeoutException;
+use PaymentGatewayCloud\Client\Http\CurlClient;
+use PaymentGatewayCloud\Client\Http\Response;
+use PaymentGatewayCloud\Client\StatusApi\StatusRequestData;
+use PaymentGatewayCloud\Client\Transaction\Base\AbstractTransaction;
+use PaymentGatewayCloud\Client\Transaction\Capture;
+use PaymentGatewayCloud\Client\Transaction\Debit;
+use PaymentGatewayCloud\Client\Transaction\Deregister;
+use PaymentGatewayCloud\Client\Transaction\Payout;
+use PaymentGatewayCloud\Client\Transaction\Preauthorize;
+use PaymentGatewayCloud\Client\Transaction\Refund;
+use PaymentGatewayCloud\Client\Transaction\Register;
+use PaymentGatewayCloud\Client\Transaction\Result;
+use PaymentGatewayCloud\Client\Transaction\VoidTransaction;
+use PaymentGatewayCloud\Client\Xml\Generator;
+use PaymentGatewayCloud\Client\Xml\Parser;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
  * Class Client
  *
- * @package PaymentGateway\Client
+ * @package PaymentGatewayCloud\Client
  */
 class Client {
 
@@ -560,7 +560,7 @@ class Client {
     /**
      * void a previously preauthorized transaction
      *
-     * @param \PaymentGateway\Client\Transaction\VoidTransaction $transactionData
+     * @param \PaymentGatewayCloud\Client\Transaction\VoidTransaction $transactionData
      *
      * @return Result
      * @throws ClientException

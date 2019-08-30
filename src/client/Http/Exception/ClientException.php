@@ -1,12 +1,12 @@
 <?php
 
 
-namespace PaymentGateway\Client\Http\Exception;
+namespace PaymentGatewayCloud\Client\Http\Exception;
 
 /**
  * Class ClientException
  *
- * @package PaymentGateway\Client\Http\Exception
+ * @package PaymentGatewayCloud\Client\Http\Exception
  */
 class ClientException extends \Exception {
 

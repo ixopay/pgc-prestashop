@@ -1,9 +1,15 @@
 # Release Notes
 
-## v1.0.0 (2019-08-30)
+## Unreleased
+
+## v1.0.1 (2019-08-30)
+### Changed
+- Improved build stability
+
+## v1.0.0 (2019-08-29)
 ### Added
-- Build script and [readme](README.md) with instructions
-- [Changelog](CHANGELOG.md)
+- Build script and [README](README.md) with instructions
+- [CHANGELOG](CHANGELOG.md)
 ### Changed
 - Moved renamed source to `src`
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction\Base;
+namespace PaymentGatewayCloud\Client\Transaction\Base;
 
 /**
  * Class AbstractReferenced
  *
- * @package PaymentGateway\Client\Transaction
+ * @package PaymentGatewayCloud\Client\Transaction
  */
 abstract class AbstractTransactionWithReference extends AbstractTransaction {
 

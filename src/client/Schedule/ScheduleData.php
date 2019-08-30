@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\Schedule;
+namespace PaymentGatewayCloud\Client\Schedule;
 
-use PaymentGateway\Client\Transaction\Base\AmountableInterface;
+use PaymentGatewayCloud\Client\Transaction\Base\AmountableInterface;
 
 /**
  * Class Schedule
  *
- * @package PaymentGateway\Client\Data
+ * @package PaymentGatewayCloud\Client\Data
  */
 class ScheduleData implements AmountableInterface {
 

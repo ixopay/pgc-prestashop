@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction;
+namespace PaymentGatewayCloud\Client\Transaction;
 
-use PaymentGateway\Client\Transaction\Base\AbstractTransactionWithReference;
+use PaymentGatewayCloud\Client\Transaction\Base\AbstractTransactionWithReference;
 
 /**
  * Deregister: Cancels the registration from a previous Register call.
  *
- * @package PaymentGateway\Client\Transaction
+ * @package PaymentGatewayCloud\Client\Transaction
  */
 class Deregister extends AbstractTransactionWithReference {
 

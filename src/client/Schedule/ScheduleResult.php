@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Schedule;
+namespace PaymentGatewayCloud\Client\Schedule;
 
 /**
  * Class Result
  *
- * @package PaymentGateway\Client\Data
+ * @package PaymentGatewayCloud\Client\Data
  */
 class ScheduleResult {
 

@@ -7,24 +7,24 @@
 
 ## Build
 
-- Clone or download the source from this repository.
-
-- Update `src/logo.png`, `src/logo.gif` and images in `src/views/img/creditcard`.
-
-- Run the build script to automatically change white labeled source and create a zip file ready for distribution. 
-
-    $ php build.php "My Payment Provider" gateway.mypaymentprovider.com
-
+* Clone or download the source from this repository.
+* Update [src/logo.png](src/logo.png), [src/logo.gif](src/logo.gif) and images in [src/views/img/creditcard](src/views/img/creditcard).
+* Run the build script to apply desired branding and create a zip file ready for distribution:
+```shell script
+php build.php gateway.mypaymentprovider.com "My Payment Provider"
+```
 - Verify the contents of `build` to make sure they meet desired results.
-
-- Test by installing the built extension zip file in an existing shop installation.
-
+- Find the newly versioned zip file in the `dist` folder.
+- Test by installing the extension in an existing shop installation (see [src/README](src/README.md)).
 - Distribute the versioned zip file.
 
 ## Provide Updates
 
-- Fetch the updated source from this repository (see [Changelog](CHANGELOG.md)).<br>Note: make sure to not overwrite any previous changes you've made for the previous version, or re-apply these changes.
-
-- Run the build script with the same parameters as the first time.
-
-- Distribute the newly versioned zip file. 
+- Fetch the updated source from this repository (see [CHANGELOG](CHANGELOG.md)).<br>Note: make sure to not overwrite any previous changes you've made for the previous version, or re-apply these changes.
+- Run the build script with the same parameters as the first time:
+```shell script
+php build.php gateway.mypaymentprovider.com "My Payment Provider"
+```
+- Find the newly versioned zip file in the `dist` folder.
+- Test by updating the extension in an existing shop installation (see [src/README](src/README.md)).
+- Distribute the newly versioned zip file.

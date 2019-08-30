@@ -7,16 +7,16 @@
  * to avoid any conflicts with others containers.
  */
 
-#payment_gateway_payment_button a {
+#payment_gateway_cloud_payment_button a {
 	padding: 10px;
 	background-color: #FBFBFB;
 }
 
-#payment_gateway_payment_button a:hover {
+#payment_gateway_cloud_payment_button a:hover {
 	background-color: #f6f6f6;
 }
 
-#payment_gateway_payment_button a:after {
+#payment_gateway_cloud_payment_button a:after {
 	display: block;
 	content: "\f054";
 	position: absolute;

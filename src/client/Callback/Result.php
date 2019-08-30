@@ -1,16 +1,16 @@
 <?php
 
-namespace PaymentGateway\Client\Callback;
+namespace PaymentGatewayCloud\Client\Callback;
 
-use PaymentGateway\Client\Data\Customer;
-use PaymentGateway\Client\Data\Result\ResultData;
-use PaymentGateway\Client\Transaction\Error;
+use PaymentGatewayCloud\Client\Data\Customer;
+use PaymentGatewayCloud\Client\Data\Result\ResultData;
+use PaymentGatewayCloud\Client\Transaction\Error;
 
 /**
  * Callback result, which is produced by processing a callback request's body.
  * Reports the status of an asynchronous transaction.
  *
- * @package PaymentGateway\Client\Callback
+ * @package PaymentGatewayCloud\Client\Callback
  */
 class Result {
     /** The callback reports, that the transaction finished successfully. */

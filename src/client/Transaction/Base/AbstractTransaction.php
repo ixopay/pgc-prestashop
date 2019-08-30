@@ -1,14 +1,14 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction\Base;
+namespace PaymentGatewayCloud\Client\Transaction\Base;
 
-use PaymentGateway\Client\Data\Customer;
-use PaymentGateway\Client\Data\Request;
+use PaymentGatewayCloud\Client\Data\Customer;
+use PaymentGatewayCloud\Client\Data\Request;
 
 /**
  * Class AbstractTransaction
  *
- * @package PaymentGateway\Client\Transaction
+ * @package PaymentGatewayCloud\Client\Transaction
  */
 class AbstractTransaction {
 

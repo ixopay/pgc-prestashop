@@ -2,7 +2,7 @@
 /**
  */
 
-class PaymentGatewayReturnModuleFrontController extends ModuleFrontController
+class PaymentGatewayCloudReturnModuleFrontController extends ModuleFrontController
 {
 
     public function postProcess()
@@ -58,7 +58,7 @@ class PaymentGatewayReturnModuleFrontController extends ModuleFrontController
         if (!$specific) {
             $specific = 'return';
         }
-        $this->module = Module::getInstanceByName('paymentgateway');
+        $this->module = Module::getInstanceByName('paymentgatewaycloud');
         return $this->module->l($key, $specific);
     }
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Data;
+namespace PaymentGatewayCloud\Client\Data;
 
 /**
  * Class Item
  *
- * @package PaymentGateway\Client\Data
+ * @package PaymentGatewayCloud\Client\Data
  */
 class Item extends Data {
 

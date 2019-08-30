@@ -1,11 +1,11 @@
 <?php
 
-namespace PaymentGateway\Client\Http;
+namespace PaymentGatewayCloud\Client\Http;
 
 /**
  * Interface ResponseInterface
  *
- * @package PaymentGateway\Client\Http
+ * @package PaymentGatewayCloud\Client\Http
  */
 interface ResponseInterface {
 

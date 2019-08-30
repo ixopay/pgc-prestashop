@@ -1,13 +1,13 @@
 <?php
 
-namespace PaymentGateway\Client\CustomerProfile;
+namespace PaymentGatewayCloud\Client\CustomerProfile;
 
-use PaymentGateway\Client\Json\DataObject;
+use PaymentGatewayCloud\Client\Json\DataObject;
 
 /**
  * Class CustomerData
  *
- * @package PaymentGateway\Client\CustomerProfile
+ * @package PaymentGatewayCloud\Client\CustomerProfile
  *
  * @property string firstName
  * @property string $lastName

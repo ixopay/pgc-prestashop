@@ -1,10 +1,10 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction\Base;
+namespace PaymentGatewayCloud\Client\Transaction\Base;
 
 /**
  * Interface AddToCustomerProfileInterface
- * @package PaymentGateway\Client\Transaction\Base
+ * @package PaymentGatewayCloud\Client\Transaction\Base
  */
 interface AddToCustomerProfileInterface {
 

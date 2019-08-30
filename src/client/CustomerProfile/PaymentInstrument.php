@@ -1,14 +1,14 @@
 <?php
 
-namespace PaymentGateway\Client\CustomerProfile;
+namespace PaymentGatewayCloud\Client\CustomerProfile;
 
-use PaymentGateway\Client\CustomerProfile\PaymentData\PaymentData;
-use PaymentGateway\Client\Json\DataObject;
+use PaymentGatewayCloud\Client\CustomerProfile\PaymentData\PaymentData;
+use PaymentGatewayCloud\Client\Json\DataObject;
 
 /**
  * Class PaymentInstrument
  *
- * @package PaymentGateway\Client\CustomerProfile
+ * @package PaymentGatewayCloud\Client\CustomerProfile
  *
  * @property string $method
  * @property string $paymentToken

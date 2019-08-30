@@ -1,23 +1,23 @@
 <?php
 
-namespace PaymentGateway\Client\Transaction;
+namespace PaymentGatewayCloud\Client\Transaction;
 
-use PaymentGateway\Client\Transaction\Base\AbstractTransactionWithReference;
-use PaymentGateway\Client\Transaction\Base\AddToCustomerProfileInterface;
-use PaymentGateway\Client\Transaction\Base\AddToCustomerProfileTrait;
-use PaymentGateway\Client\Transaction\Base\AmountableInterface;
-use PaymentGateway\Client\Transaction\Base\AmountableTrait;
-use PaymentGateway\Client\Transaction\Base\ItemsInterface;
-use PaymentGateway\Client\Transaction\Base\ItemsTrait;
-use PaymentGateway\Client\Transaction\Base\OffsiteInterface;
-use PaymentGateway\Client\Transaction\Base\OffsiteTrait;
-use PaymentGateway\Client\Transaction\Base\ScheduleInterface;
-use PaymentGateway\Client\Transaction\Base\ScheduleTrait;
+use PaymentGatewayCloud\Client\Transaction\Base\AbstractTransactionWithReference;
+use PaymentGatewayCloud\Client\Transaction\Base\AddToCustomerProfileInterface;
+use PaymentGatewayCloud\Client\Transaction\Base\AddToCustomerProfileTrait;
+use PaymentGatewayCloud\Client\Transaction\Base\AmountableInterface;
+use PaymentGatewayCloud\Client\Transaction\Base\AmountableTrait;
+use PaymentGatewayCloud\Client\Transaction\Base\ItemsInterface;
+use PaymentGatewayCloud\Client\Transaction\Base\ItemsTrait;
+use PaymentGatewayCloud\Client\Transaction\Base\OffsiteInterface;
+use PaymentGatewayCloud\Client\Transaction\Base\OffsiteTrait;
+use PaymentGatewayCloud\Client\Transaction\Base\ScheduleInterface;
+use PaymentGatewayCloud\Client\Transaction\Base\ScheduleTrait;
 
 /**
  * Debit: Charge the customer for a certain amount of money. This could be once, but also recurring.
  *
- * @package PaymentGateway\Client\Transaction
+ * @package PaymentGatewayCloud\Client\Transaction
  */
 class Debit extends AbstractTransactionWithReference implements AmountableInterface, OffsiteInterface, ItemsInterface, ScheduleInterface, AddToCustomerProfileInterface {
     use OffsiteTrait;
