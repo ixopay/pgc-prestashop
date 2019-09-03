@@ -330,6 +330,7 @@ class PaymentGatewayCloud extends PaymentModule
      * Payment options hook
      *
      * @param $params
+     * @throws Exception
      * @return bool|void
      */
     public function hookPaymentOptions($params)
@@ -373,7 +374,7 @@ class PaymentGatewayCloud extends PaymentModule
 
                 $this->context->smarty->assign([
                     'paymentType' => $creditCard,
-                    'id' => bin2hex(random_bytes(10)),
+                    'id' => 'p' . bin2hex(random_bytes(10)),
                     'action' => $payment->getAction(),
                     'integrationKey' => Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_INTEGRATION_KEY', null),
                 ]);

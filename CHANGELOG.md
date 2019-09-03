@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## v1.1.0 (2019-09-03)
+### Added
+- 3D Secure 2.0 extra data
+### Fixed
+- Potentially invalid global javascript property for payment instance 
+- Incorrectly named global javascript variable 
+
 ## v1.0.1 (2019-08-30)
 ### Changed
 - Improved build stability
