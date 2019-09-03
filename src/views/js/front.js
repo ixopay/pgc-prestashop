@@ -1,44 +1,45 @@
 /**
  */
 
-$(document).ready(
-    function () {
-        $(document).on('submit', '#payment-form', function (e) {
-            var form = $(this);
-            var id = form.attr('data-id');
-            if (form.attr('action').search('creditcard') >= 0) {
-                placeOrder(e);
+$(document).on('submit', '#payment-form', function (e) {
+    var form = $(this);
+    var id = form.attr('data-id');
+
+    if(!id || !window.paymentGatewayCloudPayment.hasOwnProperty(id)) {
+        return true;
+    }
+
+    if (form.attr('action').search('creditcard') >= 0) {
+        placeOrder(e);
+    }
+
+    e.preventDefault();
+
+    var data = {
+        first_name: form.find('[name=ccFirstName]').val(),
+        last_name: form.find('[name=ccLastName]').val(),
+        month: form.find('[name=ccExpiryMonth]').val(),
+        year: form.find('[name=ccExpiryYear]').val(),
+        //email: form.find('[name=ccEmail]').val(),
+    };
+
+    let payment = window.paymentGatewayCloudPayment[id];
+
+    payment.tokenize(
+        data,
+        (token, cardData) => {
+            form.append('<input type="hidden" name="token" value="' + token + '"/>');
+            form[0].submit();
+        },
+        function (errors) {
+
+            var errorsTexts = [];
+            for (let i = 0; i < errors.length; i++) {
+                errorsTexts.push(errors[i].message);
             }
 
-            e.preventDefault();
-
-            var data = {
-                first_name: form.find('[name=ccFirstName]').val(),
-                last_name: form.find('[name=ccLastName]').val(),
-                month: form.find('[name=ccExpiryMonth]').val(),
-                year: form.find('[name=ccExpiryYear]').val(),
-                //email: form.find('[name=ccEmail]').val(),
-            };
-
-            let payment = window.paymentGatewayCloudCloudPayment[id];
-
-            payment.tokenize(
-                data,
-                (token, cardData) => {
-                    form.append('<input type="hidden" name="token" value="' + token + '"/>');
-                    form[0].submit();
-                },
-                function (errors) {
-
-                    var errorsTexts = [];
-                    for (let i = 0; i < errors.length; i++) {
-                        errorsTexts.push(errors[i].message);
-                    }
-
-                    $("#payment-error-" + id).show().html(errorsTexts.join('<br>'));
-                    console.log(errors);
-                }
-            );
-        });
-    }
-);
+            $("#payment-error-" + id).show().html(errorsTexts.join('<br>'));
+            console.log(errors);
+        }
+    );
+});
