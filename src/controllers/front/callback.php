@@ -14,8 +14,8 @@ class PaymentGatewayCloudCallbackModuleFrontController extends ModuleFrontContro
 
         \PaymentGatewayCloud\Client\Client::setApiUrl(Configuration::get('PAYMENT_GATEWAY_CLOUD_HOST', null));
         $client = new \PaymentGatewayCloud\Client\Client(
-            Configuration::get('PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER', null),
-            Configuration::get('PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD', null),
+            Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_USER', null),
+            Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_PASSWORD', null),
             Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_API_KEY', null),
             Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SHARED_SECRET', null)
         );

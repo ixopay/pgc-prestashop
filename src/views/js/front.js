@@ -39,7 +39,6 @@ $(document).on('submit', '#payment-form', function (e) {
             }
 
             $("#payment-error-" + id).show().html(errorsTexts.join('<br>'));
-            console.log(errors);
         }
     );
 });

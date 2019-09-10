@@ -66,9 +66,10 @@ class PaymentGatewayCloud extends PaymentModule
     public function uninstall()
     {
         // TODO: delete Configuration
+        // $prefix = strtoupper(str_replace(' ', '', $creditCard));
         // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_ENABLED');
-        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER');
-        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD');
+        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_USER');
+        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_PASSWORD');
         // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_HOST');
 
         return parent::uninstall();
@@ -129,8 +130,11 @@ class PaymentGatewayCloud extends PaymentModule
 
     private function getCreditCards()
     {
+        /**
+         * Comment/disable adapters that are not applicable
+         */
         return [
-            'cc' => 'CreditCard',
+            'cc' => 'Credit Card',
             'visa' => 'Visa',
             'mastercard' => 'MasterCard',
             'amex' => 'Amex',
@@ -152,7 +156,7 @@ class PaymentGatewayCloud extends PaymentModule
             'form' => [
                 'tabs' => [
                     'General' => 'General',
-                    'CreditCard' => 'CreditCard',
+                    'CreditCard' => 'Credit Card',
                 ],
                 'legend' => [
                     'title' => $this->l('Settings'),
@@ -179,24 +183,11 @@ class PaymentGatewayCloud extends PaymentModule
                         ],
                     ],
                     [
-                        'name' => 'PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER',
-                        'label' => $this->l('User'),
-                        'tab' => 'General',
-                        'type' => 'text',
-                    ],
-                    [
-                        'name' => 'PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD',
-                        'label' => $this->l('Password'),
-                        'tab' => 'General',
-                        'type' => 'text',
-                    ],
-                    [
                         'name' => 'PAYMENT_GATEWAY_CLOUD_HOST',
                         'label' => $this->l('Host'),
                         'tab' => 'General',
                         'type' => 'text',
                     ],
-
                     //                    [
                     //                        'type' => 'select',
                     //                        'name' => 'PAYMENT_GATEWAY_CLOUD_CC_TYPES[]',
@@ -222,8 +213,7 @@ class PaymentGatewayCloud extends PaymentModule
 
         foreach ($this->getCreditCards() as $creditCard) {
 
-            $prefix = strtoupper($creditCard);
-
+            $prefix = strtoupper(str_replace(' ', '', $creditCard));
 
             $form['form']['input'][] = [
                 'name' => 'line',
@@ -250,6 +240,24 @@ class PaymentGatewayCloud extends PaymentModule
                         'label' => 'Disabled',
                     ],
                 ],
+            ];
+            $form['form']['input'][] = [
+                'name' => 'PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TITLE',
+                'label' => $this->l('Title'),
+                'tab' => 'CreditCard',
+                'type' => 'text',
+            ];
+            $form['form']['input'][] = [
+                'name' => 'PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_USER',
+                'label' => $this->l('User'),
+                'tab' => 'CreditCard',
+                'type' => 'text',
+            ];
+            $form['form']['input'][] = [
+                'name' => 'PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_PASSWORD',
+                'label' => $this->l('Password'),
+                'tab' => 'CreditCard',
+                'type' => 'text',
             ];
             $form['form']['input'][] = [
                 'name' => 'PAYMENT_GATEWAY_CLOUD_' . $prefix . '_API_KEY',
@@ -306,16 +314,17 @@ class PaymentGatewayCloud extends PaymentModule
     {
         $values = [
             'PAYMENT_GATEWAY_CLOUD_ENABLED' => Configuration::get('PAYMENT_GATEWAY_CLOUD_ENABLED', null),
-            'PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER' => Configuration::get('PAYMENT_GATEWAY_CLOUD_ACCOUNT_USER', null),
-            'PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD' => Configuration::get('PAYMENT_GATEWAY_CLOUD_ACCOUNT_PASSWORD', null),
             'PAYMENT_GATEWAY_CLOUD_HOST' => Configuration::get('PAYMENT_GATEWAY_CLOUD_HOST', null),
             //            'PAYMENT_GATEWAY_CLOUD_CC_TYPES[]' => json_decode(Configuration::get('PAYMENT_GATEWAY_CLOUD_CC_TYPES', null)),
         ];
 
         foreach ($this->getCreditCards() as $creditCard) {
 
-            $prefix = strtoupper($creditCard);
+            $prefix = strtoupper(str_replace(' ', '', $creditCard));
             $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED', null);
+            $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TITLE'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TITLE') ?: $creditCard;
+            $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_USER'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_USER', null);
+            $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_PASSWORD'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_PASSWORD', null);
             $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_API_KEY'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_API_KEY', null);
             $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SHARED_SECRET'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SHARED_SECRET', null);
             $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_INTEGRATION_KEY'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_INTEGRATION_KEY', null);
@@ -324,7 +333,6 @@ class PaymentGatewayCloud extends PaymentModule
 
         return $values;
     }
-
 
     /**
      * Payment options hook
@@ -358,7 +366,7 @@ class PaymentGatewayCloud extends PaymentModule
 
         foreach ($this->getCreditCards() as $key => $creditCard) {
 
-            $prefix = strtoupper($creditCard);
+            $prefix = strtoupper(str_replace(' ', '', $creditCard));
 
             if (!Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED', null)) {
                 continue;
@@ -367,8 +375,10 @@ class PaymentGatewayCloud extends PaymentModule
             $payment = new PaymentOption();
             $payment
                 ->setModuleName($this->name)
-                ->setCallToActionText($this->l($creditCard))
-                ->setAction($this->context->link->getModuleLink($this->name, 'payment', ['type' => $creditCard], true));
+                ->setCallToActionText($this->l(Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TITLE', null)))
+                ->setAction($this->context->link->getModuleLink($this->name, 'payment', [
+                    'type' => $creditCard,
+                ], true));
 
             if (Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SEAMLESS', null)) {
 

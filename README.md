@@ -9,6 +9,7 @@
 
 * Clone or download the source from this repository.
 * Update [src/logo.png](src/logo.png), [src/logo.gif](src/logo.gif) and images in [src/views/img/creditcard](src/views/img/creditcard).
+* Comment/disable adapters in`src/paymentgatewaycloud.php` - see `getCreditCards()` method.
 * Run the build script to apply desired branding and create a zip file ready for distribution:
 ```shell script
 php build.php gateway.mypaymentprovider.com "My Payment Provider"
