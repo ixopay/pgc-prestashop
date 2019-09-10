@@ -2,7 +2,6 @@
     <input type="hidden" name="ccEmail" value="">
     <div>
         <div id="payment-error-{$id}" class="alert alert-warning" style="display: none;">
-            An error occured.
         </div>
         <div class="row">
             <div class="form-group col-md-6">
