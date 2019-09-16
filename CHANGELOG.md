@@ -1,5 +1,9 @@
 # Release Notes
 
+## v1.2.1 (2019-09-16)
+### Fixed
+- Revert "Credit Card" prefix to "CreditCard"
+
 ## v1.2.0 (2019-09-10)
 ### Added
 - [README](README.md) note on enabling/disabling additional adapters
