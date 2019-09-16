@@ -66,7 +66,7 @@ class PaymentGatewayCloud extends PaymentModule
     public function uninstall()
     {
         // TODO: delete Configuration
-        // $prefix = strtoupper(str_replace(' ', '', $creditCard));
+        // $prefix = strtoupper($creditCard);
         // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_ENABLED');
         // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_USER');
         // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_PASSWORD');
@@ -134,7 +134,7 @@ class PaymentGatewayCloud extends PaymentModule
          * Comment/disable adapters that are not applicable
          */
         return [
-            'cc' => 'Credit Card',
+            'cc' => 'CreditCard',
             'visa' => 'Visa',
             'mastercard' => 'MasterCard',
             'amex' => 'Amex',
@@ -213,7 +213,7 @@ class PaymentGatewayCloud extends PaymentModule
 
         foreach ($this->getCreditCards() as $creditCard) {
 
-            $prefix = strtoupper(str_replace(' ', '', $creditCard));
+            $prefix = strtoupper($creditCard);
 
             $form['form']['input'][] = [
                 'name' => 'line',
@@ -320,7 +320,7 @@ class PaymentGatewayCloud extends PaymentModule
 
         foreach ($this->getCreditCards() as $creditCard) {
 
-            $prefix = strtoupper(str_replace(' ', '', $creditCard));
+            $prefix = strtoupper($creditCard);
             $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED', null);
             $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TITLE'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TITLE') ?: $creditCard;
             $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_USER'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_USER', null);
@@ -366,7 +366,7 @@ class PaymentGatewayCloud extends PaymentModule
 
         foreach ($this->getCreditCards() as $key => $creditCard) {
 
-            $prefix = strtoupper(str_replace(' ', '', $creditCard));
+            $prefix = strtoupper($creditCard);
 
             if (!Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED', null)) {
                 continue;
