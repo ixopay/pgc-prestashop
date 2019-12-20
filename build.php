@@ -2,7 +2,7 @@
 /**
  * extension source version
  */
-$version = '1.2.1';
+$version = '1.2.2';
 
 /**
  * dist filename
@@ -71,7 +71,7 @@ if (empty($hostname)) {
  * the zip file's name without extension
  */
 $distFilename = $distFilenamePrefix . kebabCase($name) . '-' . $version . $distFilenameSuffix;
-line('    '.$distFilename);
+line('    ' . $distFilename);
 
 /**
  * relative path within zip file

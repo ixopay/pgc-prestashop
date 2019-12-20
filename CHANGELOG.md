@@ -1,5 +1,14 @@
 # Release Notes
 
+## v1.2.2 (2019-12-16)
+### Changed
+- remove old 1.6 PrestaShop flags
+- update order state management
+- add success page template
+- cleanup
+### Fixed
+- prevent duplicate orders
+
 ## v1.2.1 (2019-09-16)
 ### Fixed
 - Revert "Credit Card" prefix to "CreditCard"
