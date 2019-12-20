@@ -37,14 +37,12 @@ class PaymentGatewayCloudPaymentModuleFrontController extends ModuleFrontControl
         $cart = $this->context->cart;
         $cartId = $cart->id;
 
-        // $customer = new Customer((int) $this->context->cart->id_customer);
-
         if ($cart->id_customer == 0
             || $cart->id_address_delivery == 0
             || $cart->id_address_invoice == 0
             || !$this->module->active
         ) {
-            $this->errors = 'An error occured during the checkout process. Please try again.';
+            $this->errors = l('An error occurred during the checkout process. Please try again.');
             $this->redirectWithNotifications($this->context->link->getPageLink('order'));
         }
 
@@ -60,6 +58,9 @@ class PaymentGatewayCloudPaymentModuleFrontController extends ModuleFrontControl
             $cart->secure_key
         );
 
+        // fixes the FrontController spamming the log
+        $this->context->cookie->__unset('id_cart');
+
         /**
          * wrap everything and handle exceptions
          * validateOrder will clear this cart from generating another order (one shot)
@@ -71,6 +72,7 @@ class PaymentGatewayCloudPaymentModuleFrontController extends ModuleFrontControl
             $orderId = $this->module->currentOrder;
             $this->order = new Order($orderId);
             $this->customer = $this->order->getCustomer();
+            $billingAddress = new Address((int)$cart->id_address_invoice);
 
             /**
              * gateway client
@@ -88,47 +90,59 @@ class PaymentGatewayCloudPaymentModuleFrontController extends ModuleFrontControl
              */
             $customer = new PaymentGatewayCloud\Client\Data\Customer();
             $customer
-                // TODO: add billing data
-                // ->setBillingAddress1()
-                // ->setBillingAddress2()
-                // ->setBillingCity()
-                // ->setBillingCountry()
-                // ->setBillingPhone()
-                // ->setBillingPostcode()
-                // ->setBillingState()
-                // ->setCompany()
-                ->setEmail($this->customer->email)
                 ->setFirstName($this->customer->firstname)
-                ->setIpAddress(\Tools::getRemoteAddr())
-                ->setLastName($this->customer->lastname);
+                ->setLastName($this->customer->lastname)
+                ->setEmail($this->customer->email)
+                ->setBillingAddress1($billingAddress->address1)
+                ->setBillingAddress2($billingAddress->address2)
+                ->setBillingCity($billingAddress->city)
+                ->setBillingPostcode($billingAddress->postcode)
+                ->setBillingCountry(Country::getIsoById($billingAddress->id_country))
+                // TODO: add billing data
+                // ->setBillingPhone()
+                // ->setBillingState()
+                ->setIpAddress(\Tools::getRemoteAddr());
 
-            /**
-             * TODO: add shipping data for non-digital goods
-             */
-            // $customer
-            //     ->setShippingAddress1()
-            //     ->setShippingAddress2()
-            //     ->setShippingCity()
-            //     ->setShippingCompany()
-            //     ->setShippingCountry()
-            //     ->setShippingFirstName()
-            //     ->setShippingLastName()
-            //     ->setShippingPostcode()
-            //     ->setShippingState();
+            if (!$this->order->isVirtual()) {
+                $deliveryAddress = new Address((int) $cart->id_address_delivery);
 
-            /**
-             * debit
-             */
-            $debit = new PaymentGatewayCloud\Client\Transaction\Debit();
-            $debit->setTransactionId($orderId)
+                $customer
+                    ->setShippingFirstName($deliveryAddress->firstname)
+                    ->setShippingLastName($deliveryAddress->lastname)
+                    ->setShippingAddress1($deliveryAddress->address1)
+                    ->setShippingAddress2($deliveryAddress->address2)
+                    ->setShippingCity($deliveryAddress->city)
+                    ->setShippingPostcode($deliveryAddress->postcode)
+                    ->setShippingCountry(Country::getIsoById($deliveryAddress->id_country));
+            }
+
+            switch(Configuration::get('BANKART_PAYMENT_GATEWAY_' . $prefix . '_TRANSACTION_TYPE', null)) {
+                case 'PREAUTHORIZE':
+                    $transaction = new PaymentGatewayCloud\Client\Transaction\Preauthorize();
+                    break;
+                default:
+                case 'DEBIT':
+                    $transaction = new PaymentGatewayCloud\Client\Transaction\Debit();
+                    break;
+            }
+
+            $successUrl = $this->context->link->getPageLink(
+                'order-confirmation',
+                true,
+                $this->context->language->id,
+                ['id_cart' => $cartId, 'id_module' => $this->module->id, 'key' => $cart->secure_key]
+            );
+
+            $transaction->setTransactionId($orderId . '-' . $this->module->currentOrderReference)
                 ->setAmount(number_format(round($cart->getOrderTotal(), 2), 2, '.', ''))
                 ->setCurrency((new Currency($cart->id_currency))->iso_code)
                 ->setCustomer($customer)
                 ->setExtraData($this->extraData3DS())
-                ->setSuccessUrl($this->context->link->getModuleLink($this->module->name, 'return', ['id_cart' => $cartId, 'type' => $paymentType, 'state' => 'success'], true))
-                ->setCancelUrl($this->context->link->getModuleLink($this->module->name, 'return', ['id_cart' => $cartId, 'type' => $paymentType, 'state' => 'cancel'], true))
-                ->setErrorUrl($this->context->link->getModuleLink($this->module->name, 'return', ['id_cart' => $cartId, 'type' => $paymentType, 'state' => 'error'], true))
-                ->setCallbackUrl($this->context->link->getModuleLink($this->module->name, 'callback', ['id_cart' => $cartId, 'type' => $paymentType, 'callback' => true], true));
+                ->setMerchantMetaData('prestashop ' . _PS_VERSION_ . ' - ' . $this->module->name . ' ' . $this->module->version)
+                ->setSuccessUrl($successUrl)
+                ->setCancelUrl($this->context->link->getModuleLink($this->module->name, 'return', ['id_order' => $orderId, 'id_cart' => $cartId, 'type' => $paymentType, 'state' => 'cancel'], true))
+                ->setErrorUrl($this->context->link->getModuleLink($this->module->name, 'return', ['id_order' => $orderId, 'id_cart' => $cartId, 'type' => $paymentType, 'state' => 'error'], true))
+                ->setCallbackUrl($this->context->link->getModuleLink($this->module->name, 'callback', ['id_order' => $orderId, 'id_cart' => $cartId, 'type' => $paymentType], true));
 
             /**
              * token
@@ -140,32 +154,26 @@ class PaymentGatewayCloudPaymentModuleFrontController extends ModuleFrontControl
                     die('empty token');
                 }
 
-                $debit->setTransactionToken($token);
+                $transaction->setTransactionToken($token);
             }
 
-            /**
-             * transaction
-             */
-            $paymentResult = $client->debit($debit);
-        } catch (\Throwable $e) {
-            $this->processFailure($this->order);
-        }
+            switch (Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TRANSACTION_TYPE', null)) {
+                case 'PREAUTHORIZE':
+                    $paymentResult = $client->preauthorize($transaction);
+                    break;
+                default:
+                case 'DEBIT':
+                    $paymentResult = $client->debit($transaction);
+                    break;
+            }
 
-        if ($paymentResult->hasErrors()) {
+        } catch (\Throwable $e) {
             $this->processFailure($this->order);
         }
 
         if ($paymentResult->isSuccess()) {
 
-            $gatewayReferenceId = $paymentResult->getReferenceId();
-
-            if ($paymentResult->getReturnType() == Result::RETURN_TYPE_ERROR) {
-                //error handling
-                $errors = $paymentResult->getErrors();
-
-                $this->processFailure($this->order);
-
-            } elseif ($paymentResult->getReturnType() == Result::RETURN_TYPE_REDIRECT) {
+            if ($paymentResult->getReturnType() == Result::RETURN_TYPE_REDIRECT) {
                 if ($paymentResult->getRedirectType() === Result::REDIRECT_TYPE_FULLPAGE) {
                     // currently default
                 }
@@ -176,31 +184,12 @@ class PaymentGatewayCloudPaymentModuleFrontController extends ModuleFrontControl
 
                 Tools::redirect($paymentResult->getRedirectUrl());
 
-            } elseif ($paymentResult->getReturnType() == Result::RETURN_TYPE_PENDING) {
-                //payment is pending, wait for callback to complete
-
-                //setCartToPending();
-
             } elseif ($paymentResult->getReturnType() == Result::RETURN_TYPE_FINISHED) {
 
-                $this->module->validateOrder(
-                    $cart->id,
-                    Configuration::get('PS_OS_PAYMENT'),
-                    $cart->getOrderTotal(true),
-                    $paymentType, // change to nice title
-                    null,
-                    [],
-                    null,
-                    false,
-                    $cart->secure_key
-                );
-
-                Tools::redirect('index.php?controller=order-confirmation&id_cart='
-                    . $cart->id . '&id_module='
-                    . $this->module->id . '&id_order='
-                    . $this->module->currentOrder . '&key='
-                    . $customer->secure_key);
+                Tools::redirect($successUrl);
             }
+        } else {
+            $this->processFailure($this->order);
         }
     }
 
@@ -208,6 +197,9 @@ class PaymentGatewayCloudPaymentModuleFrontController extends ModuleFrontControl
     {
         if ($order->current_state == Configuration::get(PaymentGatewayCloud::PAYMENT_GATEWAY_CLOUD_OS_STARTING)) {
             $order->setCurrentState(_PS_OS_ERROR_);
+
+            $this->errors[] = $this->module->l('There was a problem with your payment, please try again or contact the store owner.');
+
             $params = [
                 'submitReorder' => true,
                 'id_order' => (int)$order->id,

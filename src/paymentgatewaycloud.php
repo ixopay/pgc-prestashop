@@ -27,18 +27,18 @@ class PaymentGatewayCloud extends PaymentModule
         $this->author = 'Payment Gateway Cloud';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.7', 'max' => _PS_VERSION_];
-        $this->is_eu_compatible = 1;
-        $this->controllers = ['payment'];
-
         $this->bootstrap = true;
+        $this->controllers = [
+            'payment',
+            'callback',
+            'return',
+        ];
+
         parent::__construct();
 
         $this->displayName = $this->l('Payment Gateway Cloud');
         $this->description = $this->l('Payment Gateway Cloud Payment');
-
         $this->confirmUninstall = $this->l('confirm_uninstall');
-
-        //$this->limited_currencies = array('EUR');
     }
 
     public function install()
@@ -50,6 +50,8 @@ class PaymentGatewayCloud extends PaymentModule
 
         if (!parent::install()
             || !$this->registerHook('paymentOptions')
+            || !$this->registerHook('displayPaymentReturn')
+
             || !$this->registerHook('payment')
             || !$this->registerHook('displayAfterBodyOpeningTag')
             || !$this->registerHook('header')
@@ -60,17 +62,27 @@ class PaymentGatewayCloud extends PaymentModule
         $this->createOrderState(static::PAYMENT_GATEWAY_CLOUD_OS_STARTING);
         $this->createOrderState(static::PAYMENT_GATEWAY_CLOUD_OS_AWAITING);
 
+        // set default configuration
+        Configuration::updateValue('PAYMENT_GATEWAY_CLOUD_HOST', 'https://gateway.paymentgateway.cloud/');
+
         return true;
     }
 
     public function uninstall()
     {
-        // TODO: delete Configuration
-        // $prefix = strtoupper($creditCard);
-        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_ENABLED');
-        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_USER');
-        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_PASSWORD');
-        // Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_HOST');
+        Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_ENABLED');
+        Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_HOST');
+
+        foreach ($this->getCreditCards() as $creditCard) {
+            $prefix = strtoupper($creditCard);
+            Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TITLE');
+            Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_USER');
+            Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ACCOUNT_PASSWORD');
+            Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_API_KEY');
+            Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SHARED_SECRET');
+            Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_INTEGRATION_KEY');
+            Configuration::deleteByName('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SEAMLESS');
+        }
 
         return parent::uninstall();
     }
@@ -188,22 +200,6 @@ class PaymentGatewayCloud extends PaymentModule
                         'tab' => 'General',
                         'type' => 'text',
                     ],
-                    //                    [
-                    //                        'type' => 'select',
-                    //                        'name' => 'PAYMENT_GATEWAY_CLOUD_CC_TYPES[]',
-                    //                        'label' => $this->l('Credit Cards'),
-                    //                        'multiple' => true,
-                    //                        'options' => [
-                    //                            'query' => [
-                    //                                ['key' => 'visa', 'value' => 'Visa'],
-                    //                                ['key' => 'mastercard', 'value' => 'MasterCard'],
-                    //                                ['key' => 'dinersclub', 'value' => 'Dinersclub'],
-                    //                                ['key' => 'americanexpress', 'value' => 'American Express'],
-                    //                            ],
-                    //                            'id' => 'key',
-                    //                            'name' => 'value',
-                    //                        ],
-                    //                    ],
                 ],
                 'submit' => [
                     'title' => $this->l('Save'),
@@ -315,11 +311,9 @@ class PaymentGatewayCloud extends PaymentModule
         $values = [
             'PAYMENT_GATEWAY_CLOUD_ENABLED' => Configuration::get('PAYMENT_GATEWAY_CLOUD_ENABLED', null),
             'PAYMENT_GATEWAY_CLOUD_HOST' => Configuration::get('PAYMENT_GATEWAY_CLOUD_HOST', null),
-            //            'PAYMENT_GATEWAY_CLOUD_CC_TYPES[]' => json_decode(Configuration::get('PAYMENT_GATEWAY_CLOUD_CC_TYPES', null)),
         ];
 
         foreach ($this->getCreditCards() as $creditCard) {
-
             $prefix = strtoupper($creditCard);
             $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_ENABLED', null);
             $values['PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TITLE'] = Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TITLE') ?: $creditCard;
@@ -343,22 +337,17 @@ class PaymentGatewayCloud extends PaymentModule
      */
     public function hookPaymentOptions($params)
     {
-        if (!$this->active) {
+        if (!$this->active || !Configuration::get('PAYMENT_GATEWAY_CLOUD_ENABLED', null)) {
             return;
         }
 
         $result = [];
-
-        if (!Configuration::get('PAYMENT_GATEWAY_CLOUD_ENABLED', null)) {
-            return;
-        }
 
         $years = [];
         $years[] = date('Y');
         for ($i = 1; $i <= 10; $i++) {
             $years[] = $years[0] + $i;
         }
-
         $this->context->smarty->assign([
             'months' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
             'years' => $years,
@@ -377,8 +366,8 @@ class PaymentGatewayCloud extends PaymentModule
                 ->setModuleName($this->name)
                 ->setCallToActionText($this->l(Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_TITLE', null)))
                 ->setAction($this->context->link->getModuleLink($this->name, 'payment', [
-                    'type' => $creditCard,
-                ], true));
+                        'type' => $creditCard,
+                    ], true));
 
             if (Configuration::get('PAYMENT_GATEWAY_CLOUD_' . $prefix . '_SEAMLESS', null)) {
 
@@ -393,20 +382,25 @@ class PaymentGatewayCloud extends PaymentModule
 
                 $payment->setForm($this->fetch('module:paymentgatewaycloud' . DIRECTORY_SEPARATOR . 'views' .
                     DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'front' . DIRECTORY_SEPARATOR . 'seamless.tpl'));
-
-                //                $payment->setAdditionalInformation($this->fetch('module:paymentgatewaycloud' . DIRECTORY_SEPARATOR . 'views' .
-                //                    DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'front' . DIRECTORY_SEPARATOR . 'seamless.tpl'));
             }
 
             $payment->setLogo(
-                Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/creditcard/'
-                    . $key . '.png')
+                Media::getMediaPath(_PS_MODULE_DIR_ . $this->name . '/views/img/creditcard/' . $key . '.png')
             );
 
             $result[] = $payment;
         }
 
         return count($result) ? $result : false;
+    }
+
+    public function hookDisplayPaymentReturn($params)
+    {
+        if (!$this->active || !Configuration::get('PAYMENT_GATEWAY_CLOUD_ENABLED', null)) {
+            return;
+        }
+
+        return $this->display(__FILE__, 'views/templates/hook/payment_return.tpl');
     }
 
     /**
@@ -493,7 +487,7 @@ class PaymentGatewayCloud extends PaymentModule
             $orderState->module_name = $this->name;
             $orderState->color = '#076dc4';
             $orderState->hidden = false;
-            $orderState->logable = true;
+            $orderState->logable = false;
             $orderState->delivery = false;
             $orderState->add();
 

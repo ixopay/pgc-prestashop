@@ -7,58 +7,36 @@ class PaymentGatewayCloudReturnModuleFrontController extends ModuleFrontControll
 
     public function postProcess()
     {
-        $paymentType = Tools::getValue('type');
+        $orderId = Tools::getValue('id_order');
+        $order = new Order($orderId);
+
         $paymentState = Tools::getValue('state');
-        $cartId = Tools::getValue('id_cart');
 
-        if ($paymentState == 'success') {
+        if ($paymentState == 'cancel') {
 
-            $this->processSuccess($cartId);
+            $params = [
+                'submitReorder' => true,
+                'id_order' => (int)$order->id,
+                'step' => '1',
+            ];
 
-        } else {
-            $orderId = Order::getIdByCartId((int)$cartId);
-            $order = new Order($orderId);
-
+            $this->errors[] = $this->module->l('You have canceled your payment.');
             $this->redirectWithNotifications(
-                $this->context->link->getPageLink('order', true, $order->id_lang)
+                $this->context->link->getPageLink('order', true, $order->id_lang, $params)
+            );
+
+        } else if ($paymentState == 'error') {
+
+            $params = [
+                'submitReorder' => true,
+                'id_order' => (int)$order->id,
+                'step' => '5',
+            ];
+
+            $this->errors[] = $this->module->l('There was a problem with your payment, please try again or contact the store owner.');
+            $this->redirectWithNotifications(
+                $this->context->link->getPageLink('order', true, $order->id_lang, $params)
             );
         }
-    }
-
-    public function processSuccess($cartId)
-    {
-        sleep(1);
-        $orderId = Order::getIdByCartId((int)($cartId));
-        $order = new Order($orderId);
-        $cartId = $order->id_cart;
-        $cart = new Cart((int)($cartId));
-        $customer = new Customer($cart->id_customer);
-
-        Tools::redirect('index.php?controller=order-confirmation&id_cart='
-            .$cart->id.'&id_module='
-            .$this->module->id.'&id_order='
-            .$this->module->currentOrder.'&key='
-            .$customer->secure_key);
-
-    }
-
-    /**
-     * Overwritten translation function, uses the modules translation function with fallback language functionality
-     *
-     * @param string $key translation key
-     * @param string|bool $specific filename of the translation key
-     * @param string|null $class not used!
-     * @param bool $addslashes not used!
-     * @param bool $htmlentities not used!
-     *
-     * @return string translation
-     */
-    protected function l($key, $specific = false, $class = null, $addslashes = false, $htmlentities = true)
-    {
-        if (!$specific) {
-            $specific = 'return';
-        }
-        $this->module = Module::getInstanceByName('paymentgatewaycloud');
-        return $this->module->l($key, $specific);
     }
 }
