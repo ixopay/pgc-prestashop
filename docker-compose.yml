@@ -1,0 +1,51 @@
+version: '2'
+
+services:
+  mariadb:
+    image: 'bitnami/mariadb:10.1'
+    hostname: mariadb
+    environment:
+      - MARIADB_USER=bn_prestashop
+      - MARIADB_DATABASE=bitnami_prestashop
+      - ALLOW_EMPTY_PASSWORD=yes
+  prestashop:
+    build: 'docker/'
+    volumes:
+      - '.:/source'
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      - MARIADB_HOST=mariadb
+      - MARIADB_PORT_NUMBER=3306
+      - PRESTASHOP_HOST=localhost
+      - PRESTASHOP_DATABASE_USER=bn_prestashop
+      - PRESTASHOP_DATABASE_NAME=bitnami_prestashop
+      - PRESTASHOP_PASSWORD=CHANGEME
+      - ALLOW_EMPTY_PASSWORD=yes
+      - BRANCH=master
+      - SHOP_PGC_URL=gateway-sandbox.example.com
+      - SHOP_PGC_USER=test-user
+      - SHOP_PGC_PASSWORD=test-pass
+      - SHOP_PGC_API_KEY=test-key
+      - SHOP_PGC_SECRET=secret
+      - SHOP_PGC_INTEGRATION_KEY=int-key
+      - SHOP_PGC_CC_AMEX=1
+      - SHOP_PGC_CC_DINERS=1
+      - SHOP_PGC_CC_DISCOVER=1
+      - SHOP_PGC_CC_JCB=1
+      - SHOP_PGC_CC_MAESTRO=1
+      - SHOP_PGC_CC_MASTERCARD=1
+      - SHOP_PGC_CC_UNIOPNPAY=1
+      - SHOP_PGC_CC_VISA=1
+      - SHOP_PGC_CC_SEAMLESS=0
+      - SHOP_PGC_CC_AMEX_SEAMLESS=1
+      - SHOP_PGC_CC_DINERS_SEAMLESS=1
+      - SHOP_PGC_CC_DISCOVER_SEAMLESS=1
+      - SHOP_PGC_CC_JCB_SEAMLESS=1
+      - SHOP_PGC_CC_MAESTRO_SEAMLESS=1
+      - SHOP_PGC_CC_MASTERCARD_SEAMLESS=1
+      - SHOP_PGC_CC_UNIOPNPAY_SEAMLESS=1
+      - SHOP_PGC_CC_VISA_SEAMLESS=1
+    depends_on:
+      - mariadb
