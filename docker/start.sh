@@ -15,24 +15,40 @@ if [ ! -f "/setup_complete" ]; then
 
     echo -e "Installing PGC Extension"
 
-    if [ ! -d "/source/.git" ] && [ ! -f  "/source/.git" ]; then
-        echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
-        git clone $REPOSITORY /tmp/paymentgatewaycloud
-        cd /tmp/paymentgatewaycloud
-        git checkout $BRANCH
-        mv src paymentgatewaycloud
+    if [ "${BUILD_ARTIFACT}" != "undefined" ]; then
+        if [ -f /dist/paymentgatewaycloud.zip ]; then
+            echo -e "Using Supplied zip ${BUILD_ARTIFACT}"
+            cp /dist/paymentgatewaycloud.zip /paymentgatewaycloud.zip
+        else
+            echo "Faled to build!, there is no such file: ${BUILD_ARTIFACT}"
+            exit 1
+        fi
     else
-        echo -e "Using Development Source!"
-        mkdir -p /tmp/paymentgatewaycloud
-        cp -R /source/src/* /tmp/paymentgatewaycloud/
-        cd /tmp
+        if [ ! -d "/source/.git" ] && [ ! -f  "/source/.git" ]; then
+            echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
+            git clone $REPOSITORY /tmp/paymentgatewaycloud
+            cd /tmp/paymentgatewaycloud
+            git checkout $BRANCH
+            mv src paymentgatewaycloud
+        else
+            echo -e "Using Development Source!"
+            mkdir -p /tmp/paymentgatewaycloud
+            cp -R /source/src/* /tmp/paymentgatewaycloud/
+            cd /tmp
+        fi
+        zip -q -r /paymentgatewaycloud.zip paymentgatewaycloud
     fi
-    zip -q -r /paymentgatewaycloud.zip paymentgatewaycloud
     php /opt/bitnami/prestashop/bin/console prestashop:module install /paymentgatewaycloud.zip
     
-    # Enable SSL Everywhere
-    mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED';"
-    mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED_EVERYWHERE';"
+    if [ $PRECONFIGURE ]; then
+        # Enable SSL Everywhere
+        mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED_EVERYWHERE';"
+    else
+        # Disable SSL Everywhere
+        mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '0', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '0', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED_EVERYWHERE';"
+    fi
 
     echo -e "Configuring Extension"
 
@@ -134,7 +150,7 @@ if [ ! -f "/setup_complete" ]; then
         fi
     fi
 
-    echo -e "Setup Complete"
+    echo -e "Setup Complete! You can access the instance at: http://${PRESTASHOP_HOST}"
 
     touch /setup_complete
 

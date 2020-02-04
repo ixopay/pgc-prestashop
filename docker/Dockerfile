@@ -1,39 +1,12 @@
-FROM bitnami/prestashop:1.7
+FROM bitnami/prestashop:latest
 
 EXPOSE 80
 
 VOLUME /bitnami
 VOLUME /source
+VOLUME /dist
 
-ENV ALLOW_EMPTY_PASSWORD="no" \
-    BITNAMI_APP_NAME="prestashop" \
-    BITNAMI_IMAGE_VERSION="1.7.6-2-debian-9-r8" \
-    MARIADB_HOST="mariadb" \
-    MARIADB_PORT_NUMBER="3306" \
-    MARIADB_ROOT_PASSWORD="" \
-    MARIADB_ROOT_USER="root" \
-    MYSQL_CLIENT_CREATE_DATABASE_NAME="" \
-    MYSQL_CLIENT_CREATE_DATABASE_PASSWORD="" \
-    MYSQL_CLIENT_CREATE_DATABASE_PRIVILEGES="ALL" \
-    MYSQL_CLIENT_CREATE_DATABASE_USER="" \
-    PATH="/opt/bitnami/apache/bin:/opt/bitnami/php/bin:/opt/bitnami/php/sbin:/opt/bitnami/mysql/bin:/opt/bitnami/prestashop/bin:$PATH" \
-    PRESTASHOP_COOKIE_CHECK_IP="yes" \
-    PRESTASHOP_COUNTRY="us" \
-    PRESTASHOP_DATABASE_NAME="bitnami_prestashop" \
-    PRESTASHOP_DATABASE_PASSWORD="" \
-    PRESTASHOP_DATABASE_USER="bn_prestashop" \
-    PRESTASHOP_EMAIL="user@example.com" \
-    PRESTASHOP_FIRST_NAME="Bitnami" \
-    PRESTASHOP_HOST="localhost" \
-    PRESTASHOP_LANGUAGE="en" \
-    PRESTASHOP_LAST_NAME="User" \
-    PRESTASHOP_PASSWORD="bitnami1" \
-    SMTP_HOST="" \
-    SMTP_PASSWORD="" \
-    SMTP_PORT="" \
-    SMTP_PROTOCOL="" \
-    SMTP_USER="" \
-    PRECONFIGURE="" \
+ENV PRECONFIGURE="" \
     REPOSITORY="https://github.com/user/repo" \
     BRANCH=$DEFAULT_BRANCH \
     SHOP_PGC_URL="sandbox" \
