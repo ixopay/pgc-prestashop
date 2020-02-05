@@ -33,7 +33,7 @@ ENV PRECONFIGURE="" \
     SHOP_PGC_CC_UNIOPNPAY_SEAMLESS="1" \
     SHOP_PGC_CC_VISA_SEAMLESS="1"
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install --no-install-recommends -y \
   git \
   zip \
   && apt-get autoclean
