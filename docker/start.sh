@@ -2,6 +2,14 @@
 # set -x
 #set -euo pipefail
 
+fix_symlink() {
+    unlink $1
+    mkdir $1
+    cp -r $2/* $1/
+    cp -r $2/.* $1/
+    chown -R bitnami:daemon $1
+}
+
 echo -e "Starting Prestashop"
 
 /app-entrypoint.sh nami start --foreground apache &
@@ -171,10 +179,6 @@ if [ ! -f "/setup_complete" ]; then
     fi
 
 else
-
-    if [ ! -d "/bitnami/prestashop" ]; then
-        ln -s /opt/bitnami/prestashop /bitnami/prestashop
-    fi
 
     # Keep script Running
     trap : TERM INT; (while true; do sleep 1m; done) & wait
