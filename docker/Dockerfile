@@ -8,7 +8,9 @@ VOLUME /dist
 
 ENV PRECONFIGURE="" \
     REPOSITORY="https://github.com/user/repo" \
-    BRANCH=$DEFAULT_BRANCH \
+    BRANCH="master" \
+    WHITELABEL="" \
+    BUILD_ARTIFACT="undefined" \
     SHOP_PGC_URL="sandbox" \
     SHOP_PGC_USER="test-user" \
     SHOP_PGC_PASSWORD="test-pass" \
@@ -39,5 +41,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   && apt-get autoclean
 
 COPY start.sh /start.sh
+COPY whitelabel_vars.php /whitelabel.php
 
 ENTRYPOINT ["/start.sh"]
