@@ -24,6 +24,7 @@ if [ ! -f "/setup_complete" ]; then
 
     echo -e "Installing PGC Extension"
 
+    DB_FIELD_NAME="PAYMENT_GATEWAY_CLOUD"
     if [ "${BUILD_ARTIFACT}" != "undefined" ]; then
         if [ -f /dist/paymentgatewaycloud.zip ]; then
             echo -e "Using Supplied zip ${BUILD_ARTIFACT}"
@@ -38,14 +39,21 @@ if [ ! -f "/setup_complete" ]; then
             git clone $REPOSITORY /tmp/paymentgatewaycloud
             cd /tmp/paymentgatewaycloud
             git checkout $BRANCH
-            mv src paymentgatewaycloud
         else
             echo -e "Using Development Source!"
             mkdir -p /tmp/paymentgatewaycloud
-            cp -R /source/src/* /tmp/paymentgatewaycloud/
-            cd /tmp
+            cp -R /source/* /tmp/paymentgatewaycloud/
         fi
-        zip -q -r /paymentgatewaycloud.zip paymentgatewaycloud
+        cd /tmp/paymentgatewaycloud
+        if [ ! -z "${WHITELABEL}" ]; then
+            echo -e "Running Whitelabel Script for ${WHITELABEL}"
+            DEST_FILE="$(echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" | tail -n 1 | sed 's/.*Created file "\(.*\)".*/\1/g')"
+            DB_FIELD_NAME="$(php /whitelabel.php constantCase "${WHITELABEL}")"
+            cp "${DEST_FILE}" /paymentgatewaycloud.zip
+        else
+           mv src paymentgatewaycloud
+           zip -q -r /paymentgatewaycloud.zip paymentgatewaycloud
+        fi
     fi
     php /opt/bitnami/prestashop/bin/console prestashop:module install /paymentgatewaycloud.zip
     
@@ -68,94 +76,94 @@ if [ ! -f "/setup_complete" ]; then
     # Enable PGC Payment Providers
     if [ $SHOP_PGC_URL ]; then
         echo -e "Enabling PGC Extension"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_ENABLED';"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_URL',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_HOST';"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_CREDITCARD_ENABLED';"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_CREDITCARD_ACCOUNT_USER';"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_CREDITCARD_ACCOUNT_PASSWORD';"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_CREDITCARD_API_KEY';"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_CREDITCARD_SHARED_SECRET';"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_CREDITCARD_INTEGRATION_KEY';"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_CREDITCARD_SEAMLESS';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_ENABLED';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_URL',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_HOST';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_CREDITCARD_ENABLED';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_CREDITCARD_ACCOUNT_USER';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_CREDITCARD_ACCOUNT_PASSWORD';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_CREDITCARD_API_KEY';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_CREDITCARD_SHARED_SECRET';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_CREDITCARD_INTEGRATION_KEY';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_CREDITCARD_SEAMLESS';"
         if [ $SHOP_PGC_CC_AMEX ]; then
             echo -e "Enabling Amex PGC Extension"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_AMEX_ENABLED';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_AMEX_ACCOUNT_USER';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_AMEX_ACCOUNT_PASSWORD';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_AMEX_API_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_AMEX_SHARED_SECRET';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_AMEX_INTEGRATION_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_AMEX_SEAMLESS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_AMEX_ENABLED';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_AMEX_ACCOUNT_USER';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_AMEX_ACCOUNT_PASSWORD';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_AMEX_API_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_AMEX_SHARED_SECRET';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_AMEX_INTEGRATION_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_AMEX_SEAMLESS';"
         fi
         if [ $SHOP_PGC_CC_DINERS ]; then
             echo -e "Enabling Diners PGC Extension"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DINERS_ENABLED';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DINERS_ACCOUNT_USER';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DINERS_ACCOUNT_PASSWORD';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DINERS_API_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DINERS_SHARED_SECRET';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DINERS_INTEGRATION_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DINERS_SEAMLESS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DINERS_ENABLED';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DINERS_ACCOUNT_USER';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DINERS_ACCOUNT_PASSWORD';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DINERS_API_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DINERS_SHARED_SECRET';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DINERS_INTEGRATION_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DINERS_SEAMLESS';"
         fi
         if [ $SHOP_PGC_CC_DISCOVER ]; then
             echo -e "Enabling Discover PGC Extension"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DISCOVER_ENABLED';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DISCOVER_ACCOUNT_USER';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DISCOVER_ACCOUNT_PASSWORD';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DISCOVER_API_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DISCOVER_SHARED_SECRET';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DISCOVER_INTEGRATION_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_DISCOVER_SEAMLESS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DISCOVER_ENABLED';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DISCOVER_ACCOUNT_USER';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DISCOVER_ACCOUNT_PASSWORD';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DISCOVER_API_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DISCOVER_SHARED_SECRET';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DISCOVER_INTEGRATION_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_DISCOVER_SEAMLESS';"
         fi
         if [ $SHOP_PGC_CC_JCB ]; then
             echo -e "Enabling JCB PGC Extension"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_JCB_ENABLED';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_JCB_ACCOUNT_USER';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_JCB_ACCOUNT_PASSWORD';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_JCB_API_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_JCB_SHARED_SECRET';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_JCB_INTEGRATION_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_JCB_SEAMLESS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_JCB_ENABLED';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_JCB_ACCOUNT_USER';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_JCB_ACCOUNT_PASSWORD';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_JCB_API_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_JCB_SHARED_SECRET';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_JCB_INTEGRATION_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_JCB_SEAMLESS';"
         fi
         if [ $SHOP_PGC_CC_MAESTRO ]; then
             echo -e "Enabling Maestro PGC Extension"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MAESTRO_ENABLED';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MAESTRO_ACCOUNT_USER';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MAESTRO_ACCOUNT_PASSWORD';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MAESTRO_API_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MAESTRO_SHARED_SECRET';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MAESTRO_INTEGRATION_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MAESTRO_SEAMLESS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MAESTRO_ENABLED';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MAESTRO_ACCOUNT_USER';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MAESTRO_ACCOUNT_PASSWORD';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MAESTRO_API_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MAESTRO_SHARED_SECRET';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MAESTRO_INTEGRATION_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MAESTRO_SEAMLESS';"
         fi
         if [ $SHOP_PGC_CC_MASTERCARD ]; then
             echo -e "Enabling Mastercard PGC Extension"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MASTERCARD_ENABLED';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MASTERCARD_ACCOUNT_USER';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MASTERCARD_ACCOUNT_PASSWORD';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MASTERCARD_API_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MASTERCARD_SHARED_SECRET';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MASTERCARD_INTEGRATION_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_MASTERCARD_SEAMLESS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MASTERCARD_ENABLED';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MASTERCARD_ACCOUNT_USER';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MASTERCARD_ACCOUNT_PASSWORD';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MASTERCARD_API_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MASTERCARD_SHARED_SECRET';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MASTERCARD_INTEGRATION_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_MASTERCARD_SEAMLESS';"
         fi
         if [ $SHOP_PGC_CC_UNIONPAY ]; then
             echo -e "Enabling Unionpay PGC Extension"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_UNIONOPAY_ENABLED';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_UNIONOPAY_ACCOUNT_USER';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_UNIONOPAY_ACCOUNT_PASSWORD';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_UNIONOPAY_API_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_UNIONOPAY_SHARED_SECRET';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_UNIONOPAY_INTEGRATION_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_UNIONOPAY_SEAMLESS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_UNIONOPAY_ENABLED';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_UNIONOPAY_ACCOUNT_USER';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_UNIONOPAY_ACCOUNT_PASSWORD';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_UNIONOPAY_API_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_UNIONOPAY_SHARED_SECRET';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_UNIONOPAY_INTEGRATION_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_UNIONOPAY_SEAMLESS';"
         fi
         if [ $SHOP_PGC_CC_VISA ]; then
             echo -e "Enabling Visa PGC Extension"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_VISA_ENABLED';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_VISA_ACCOUNT_USER';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_VISA_ACCOUNT_PASSWORD';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_VISA_API_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_VISA_SHARED_SECRET';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_VISA_INTEGRATION_KEY';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = 'PAYMENT_GATEWAY_CLOUD_VISA_SEAMLESS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_VISA_ENABLED';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_VISA_ACCOUNT_USER';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_PASSWORD',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_VISA_ACCOUNT_PASSWORD';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_API_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_VISA_API_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_SECRET',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_VISA_SHARED_SECRET';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_INTEGRATION_KEY',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_VISA_INTEGRATION_KEY';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_CC_SEAMLESS',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_VISA_SEAMLESS';"
         fi
     fi
 

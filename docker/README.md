@@ -32,13 +32,12 @@ To develop and test plugin changes, you can run the following docker-compose com
   docker-compose up --build --force-recreate --renew-anon-volumes
 ```
 
-To test a build you generated via build.php run the following command from the plugin root directory:
+To test a whitelabeled version, run the following command from the plugin root directory:
 
 ```bash
  # PRESTASHOP_PASSWORD must contain numeral and consist of 6+ chars
- php build.php sandbox.paymentgateway.cloud "My Payment Provider"
+ WHITELABEL="My Payment Provider" \
  BITNAMI_IMAGE_VERSION="latest" \
- BUILD_ARTIFACT="${PWD}/dist/prestashop-my-payment-provider-1.2.2.zip" \
  PRESTASHOP_HOST="localhost" \
  PRESTASHOP_EMAIL="dev@example.com" \
  PRESTASHOP_PASSWORD="dev123" \
