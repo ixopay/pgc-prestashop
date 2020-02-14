@@ -32,7 +32,7 @@ ENV PRECONFIGURE="" \
     SHOP_PGC_CC_JCB_SEAMLESS="0" \
     SHOP_PGC_CC_MAESTRO_SEAMLESS="0" \
     SHOP_PGC_CC_MASTERCARD_SEAMLESS="1" \
-    SHOP_PGC_CC_UNIOPNPAY_SEAMLESS="1" \
+    SHOP_PGC_CC_UNIONPAY_SEAMLESS="1" \
     SHOP_PGC_CC_VISA_SEAMLESS="1"
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
