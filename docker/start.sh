@@ -11,7 +11,7 @@ fix_symlink() {
 
 error_exit() {
     echo "$1" 1>&2
-	exit 127
+	exit 1
 }
 
 echo -e "Starting Prestashop"
@@ -184,7 +184,7 @@ if [ ! -f "/setup_complete" ]; then
         chown -R bitnami:daemon /opt/bitnami/prestashop/
         chmod -R 775 /opt/bitnami/prestashop
 
-        kill 1
+        exit 0
     else 
         # Keep script Running
         trap : TERM INT; (while true; do sleep 1m; done) & wait
