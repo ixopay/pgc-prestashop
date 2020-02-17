@@ -171,7 +171,7 @@ if [ ! -f "/setup_complete" ]; then
         fi
     fi
 
-    echo -e "Setup Complete! You can access the instance at: http://${PRESTASHOP_HOST}"
+    echo -e "Setup Complete! You can access the instance at: http://${PRESTASHOP_HOST}/"
 
     touch /setup_complete
 
