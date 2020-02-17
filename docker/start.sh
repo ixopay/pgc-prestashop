@@ -178,9 +178,9 @@ if [ ! -f "/setup_complete" ]; then
     if [ $PRECONFIGURE ]; then
         echo -e "Prepare for Pre-Configured build"
         unlink /opt/bitnami/prestashop
+        rm -rf /opt/bitnami/prestashop
         mkdir /opt/bitnami/prestashop
-        cp -rf /bitnami/prestashop/.* /opt/bitnami/prestashop/
-        cp -rfH /bitnami/prestashop/* /opt/bitnami/prestashop/
+        cp -rfLH /bitnami/prestashop/ /opt/bitnami/prestashop
         chown -R bitnami:daemon /opt/bitnami/prestashop/
         chmod -R 775 /opt/bitnami/prestashop
 
