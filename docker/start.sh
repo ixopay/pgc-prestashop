@@ -1,6 +1,5 @@
 #!/bin/bash
-# set -x
-#set -euo pipefail
+set -euo pipefail
 
 fix_symlink() {
     unlink $1
@@ -8,6 +7,11 @@ fix_symlink() {
     cp -r $2/* $1/
     cp -r $2/.* $1/
     chown -R bitnami:daemon $1
+}
+
+error_exit() {
+    echo "$1" 1>&2
+	exit 127
 }
 
 echo -e "Starting Prestashop"
@@ -30,15 +34,14 @@ if [ ! -f "/setup_complete" ]; then
             echo -e "Using Supplied zip ${BUILD_ARTIFACT}"
             cp /dist/paymentgatewaycloud.zip /paymentgatewaycloud.zip
         else
-            echo "Faled to build!, there is no such file: ${BUILD_ARTIFACT}"
-            exit 1
+            error_exit "Faled to build!, there is no such file: ${BUILD_ARTIFACT}"
         fi
     else
         if [ ! -d "/source/.git" ] && [ ! -f  "/source/.git" ]; then
             echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
-            git clone $REPOSITORY /tmp/paymentgatewaycloud
+            git clone $REPOSITORY /tmp/paymentgatewaycloud || error_exit "Faled to clone ${BUILD_ARTIFACT}"
             cd /tmp/paymentgatewaycloud
-            git checkout $BRANCH
+            git checkout $BRANCH || error_exit "Faled to checkout ${BRANCH}"
         else
             echo -e "Using Development Source!"
             mkdir -p /tmp/paymentgatewaycloud
@@ -47,16 +50,16 @@ if [ ! -f "/setup_complete" ]; then
         cd /tmp/paymentgatewaycloud
         if [ ! -z "${WHITELABEL}" ]; then
             echo -e "Running Whitelabel Script for ${WHITELABEL}"
-            echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}"
-            DEST_FILE="$(echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" | tail -n 1 | sed 's/.*Created file "\(.*\)".*/\1/g')"
-            DB_FIELD_NAME="$(php /whitelabel.php constantCase "${WHITELABEL}")"
+            echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" || error_exit "Faled to Run Whitelabel Scriptfor '$WHITELABEL'"
+            DEST_FILE="$(echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" | tail -n 1 | sed 's/.*Created file "\(.*\)".*/\1/g')" || error_exit "Faled to extract Zip File name"
+            DB_FIELD_NAME="$(php /whitelabel.php constantCase "${WHITELABEL}")" || error_exit "Failed to extract DB-Field Name"
             cp "${DEST_FILE}" /paymentgatewaycloud.zip
         else
            mv src paymentgatewaycloud
            zip -q -r /paymentgatewaycloud.zip paymentgatewaycloud
         fi
     fi
-    php /opt/bitnami/prestashop/bin/console prestashop:module install /paymentgatewaycloud.zip
+    php /opt/bitnami/prestashop/bin/console prestashop:module install /paymentgatewaycloud.zip || error_exit "Failed to Install PGC Extension"
     
     if [ $PRECONFIGURE ]; then
         # Enable SSL Everywhere
