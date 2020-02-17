@@ -3,9 +3,9 @@ set -euo pipefail
 
 fix_symlink() {
     unlink $1
+    rm -rf $1
     mkdir $1
-    cp -rf $2/* $1/
-    cp -rf $2/.* $1/
+    cp -rfLH $2/ $1
     chown -R bitnami:daemon $1
 }
 
