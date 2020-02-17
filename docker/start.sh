@@ -4,9 +4,9 @@ set -euo pipefail
 fix_symlink() {
     unlink $1
     rm -rf $1
-    mkdir $1
-    cp -rfLH $2/* $1/ || :
+    cp -rfLH $2 $1 || :
     chown -R bitnami:daemon $1
+    chmod -R 775 $1
 }
 
 error_exit() {
@@ -59,8 +59,6 @@ if [ ! -f "/setup_complete" ]; then
            zip -q -r /paymentgatewaycloud.zip paymentgatewaycloud
         fi
     fi
-
-    fix_symlink /opt/bitnami/prestashop /bitnami/prestashop
     
     php /opt/bitnami/prestashop/bin/console prestashop:module install /paymentgatewaycloud.zip || error_exit "Failed to Install PGC Extension"
     
@@ -180,6 +178,7 @@ if [ ! -f "/setup_complete" ]; then
 
     if [ $PRECONFIGURE ]; then
         echo -e "Prepare for Pre-Configured build"
+        fix_symlink /opt/bitnami/prestashop /bitnami/prestashop
         exit 0
     else 
         # Keep script Running
