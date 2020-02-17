@@ -180,7 +180,7 @@ if [ ! -f "/setup_complete" ]; then
         unlink /opt/bitnami/prestashop
         rm -rf /opt/bitnami/prestashop
         mkdir /opt/bitnami/prestashop
-        cp -rfLH /bitnami/prestashop/ /opt/bitnami/prestashop
+        cp -rfLH /bitnami/prestashop/* /opt/bitnami/prestashop/
         chown -R bitnami:daemon /opt/bitnami/prestashop/
         chmod -R 775 /opt/bitnami/prestashop
 
