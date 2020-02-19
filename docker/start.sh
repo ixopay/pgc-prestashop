@@ -172,6 +172,12 @@ if [ ! -f "/setup_complete" ]; then
         fi
     fi
 
+    if [ $DEMO_CUSTOMER_PASSWORD ]; then
+        echo -e "Creating Demo Customer"
+        DEMO_USER_ID=$(mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_customer\` (id_shop_group, id_shop, id_gender, id_lang, id_risk, firstname, lastname, email, newsletter, optin, active, date_add, date_upd, last_passwd_gen, passwd) VALUES (1, 1, 1, 1, 0, 'Robert Z.', 'Johnson', 'RobertZJohnson@einrot.com', 0, 0, 1, NOW(), NOW(), NOW(), PASSWORD('${DEMO_CUSTOMER_PASSWORD}')); SELECT LAST_INSERT_ID();" | tail -n1)
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_address\` (id_country, id_state, id_customer, alias, company, lastname, firstname, address1, postcode, city, phone, date_add, date_upd, active) VALUES (21, 16, ${DEMO_USER_ID}, 'customer', 'Ixolit', 'Johnson', 'Robert Z.', '242 University Hill Road', 62703, 'Springfield', '217-585-5994', NOW(), NOW(), 1);"
+    fi
+
     echo -e "Setup Complete! You can access the instance at: http://${PRESTASHOP_HOST}/"
 
     touch /setup_complete
