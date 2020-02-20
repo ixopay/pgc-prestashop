@@ -179,9 +179,9 @@ if [ ! -f "/setup_complete" ]; then
 
         # Assign Groups
         mysql -u root -h mariadb bitnami_prestashop -B -e "DELETE FROM \`ps_customer_group\` WHERE id_customer = ${DEMO_USER_ID}"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT IGNORE INTO \`ps_customer_group\` (`id_customer`, `id_group`) VALUES ('${DEMO_USER_ID}', '1')"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT IGNORE INTO \`ps_customer_group\` (`id_customer`, `id_group`) VALUES ('${DEMO_USER_ID}', '2')"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT IGNORE INTO \`ps_customer_group\` (`id_customer`, `id_group`) VALUES ('${DEMO_USER_ID}', '3')"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT IGNORE INTO \`ps_customer_group\` (\`id_customer\`, \`id_group\`) VALUES ('${DEMO_USER_ID}', '1')"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT IGNORE INTO \`ps_customer_group\` (\`id_customer\`, \`id_group\`) VALUES ('${DEMO_USER_ID}', '2')"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT IGNORE INTO \`ps_customer_group\` (\`id_customer\`, \`id_group\`) VALUES ('${DEMO_USER_ID}', '3')"
 
         # Add Address
         DEMO_ADDRESS_ID=$(mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_address\` (id_country, id_state, id_customer, alias, company, lastname, firstname, address1, postcode, city, phone_mobile, date_add, date_upd, active) VALUES (21, 16, ${DEMO_USER_ID}, 'Work', 'Ixolit', 'Johnson', 'Robert Z.', '242 University Hill Road', 62703, 'Springfield', '2175855994', NOW(), NOW(), 1); SELECT LAST_INSERT_ID();" | tail -n1)
