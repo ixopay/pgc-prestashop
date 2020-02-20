@@ -175,7 +175,8 @@ if [ ! -f "/setup_complete" ]; then
     if [ $DEMO_CUSTOMER_PASSWORD ]; then
         echo -e "Creating Demo Customer"
         # Create Customer
-        DEMO_USER_ID=$(mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_customer\` (id_shop_group, id_shop, id_gender, id_lang, id_risk, firstname, lastname, email, newsletter, optin, active, date_add, date_upd, last_passwd_gen, passwd, secure_key, birthday, is_guest, id_default_group) VALUES (1, 1, 1, 1, 0, 'Robert Z.', 'Johnson', 'RobertZJohnson@einrot.com', 0, 0, 1, NOW(), NOW(), NOW(), PASSWORD('${DEMO_CUSTOMER_PASSWORD}'), 'f1c26d7d47d71ae1e76256f4542146f8', '1991-11-05', 0, 3); SELECT LAST_INSERT_ID();" | tail -n1)
+        SECRET=$(cat /bitnami/prestashop/app/config/parameters.php | grep -oP "'cookie_key' => '\K([a-zA-Z0-9]+)")
+        DEMO_USER_ID=$(mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_customer\` (id_shop_group, id_shop, id_gender, id_lang, id_risk, firstname, lastname, email, newsletter, optin, active, date_add, date_upd, last_passwd_gen, passwd, secure_key, birthday, is_guest, id_default_group) VALUES (1, 1, 1, 1, 0, 'Robert Z.', 'Johnson', 'RobertZJohnson@einrot.com', 0, 0, 1, NOW(), NOW(), NOW(), MD5('${SECRET}${DEMO_CUSTOMER_PASSWORD}'), 'f1c26d7d47d71ae1e76256f4542146f8', '1991-11-05', 0, 3); SELECT LAST_INSERT_ID();" | tail -n1)
 
         # Assign Groups
         mysql -u root -h mariadb bitnami_prestashop -B -e "DELETE FROM \`ps_customer_group\` WHERE id_customer = ${DEMO_USER_ID}"
@@ -187,7 +188,7 @@ if [ ! -f "/setup_complete" ]; then
         DEMO_ADDRESS_ID=$(mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_address\` (id_country, id_state, id_customer, alias, company, lastname, firstname, address1, postcode, city, phone_mobile, date_add, date_upd, active) VALUES (21, 16, ${DEMO_USER_ID}, 'Work', 'Ixolit', 'Johnson', 'Robert Z.', '242 University Hill Road', 62703, 'Springfield', '2175855994', NOW(), NOW(), 1); SELECT LAST_INSERT_ID();" | tail -n1)
 
         # Add Audit Log Entry
-		mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_log\` (severity, error_code, message, object_id, id_employee, object_type, date_add, date_upd) VALUES ('1', '0', 'CustomerAddress addition', '${DEMO_ADDRESS_ID}', '1', 'CustomerAddress', NOW(), NOW())"
+		mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_log\` (severity, error_code, message, object_id, id_employee, object_type, date_add, date_upd) VALUES ('1', '0', 'CustomerAddress addition', '${DEMO_ADDRESS_ID}', '1', 'CustomerAddress', NOW(), NOW());"
     fi
 
     echo -e "Setup Complete! You can access the instance at: http://${PRESTASHOP_HOST}/"
