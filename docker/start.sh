@@ -82,6 +82,7 @@ if [ ! -f "/setup_complete" ]; then
     if [ $SHOP_PGC_URL ]; then
         echo -e "Enabling PGC Extension"
         mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_ENABLED';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "DELETE FROM \`ps_configuration\` WHERE \`name\` = '${DB_FIELD_NAME}_HOST';"
         mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_URL',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_HOST';"
         mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_CREDITCARD_ENABLED';"
         mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_USER',\`date_upd\` = NOW(), \`name\` = '${DB_FIELD_NAME}_CREDITCARD_ACCOUNT_USER';"
@@ -200,11 +201,48 @@ if [ ! -f "/setup_complete" ]; then
         fix_symlink /opt/bitnami/prestashop /bitnami/prestashop
         exit 0
     else 
+        if [ $PRESTASHOP_HOST ]; then
+            echo -e "Updating Shop URL to: ${PRESTASHOP_HOST}"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_shop_url\` SET \`domain\` = '${PRESTASHOP_HOST}', \`domain_ssl\` = '${PRESTASHOP_HOST}' WHERE \`id_shop_url\` = 1;"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN_SSL';"
+            # Fix Image URLs
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1' WHERE \`name\` = 'PS_REWRITING_SETTINGS';"
+            # Update Hostname
+            if [[ "${SCHEMA}" == "http" ]]; then
+                # Disable SSL Everywhere
+                mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '0', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED';"
+                mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '0', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED_EVERYWHERE';"
+            else
+                # Enable SSL Everywhere
+                mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED';"
+                mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED_EVERYWHERE';"
+            fi
+        fi
+
         # Keep script Running
         trap : TERM INT; (while true; do sleep 1m; done) & wait
     fi
 
 else
+    if [ $PRESTASHOP_HOST ]; then
+        echo -e "Updating Shop URL to: ${PRESTASHOP_HOST}"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_shop_url\` SET \`domain\` = '${PRESTASHOP_HOST}', \`domain_ssl\` = '${PRESTASHOP_HOST}' WHERE \`id_shop_url\` = 1;"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN_SSL';"
+        # Fix Image URLs
+        mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1' WHERE \`name\` = 'PS_REWRITING_SETTINGS';"
+        # Update Hostname
+        if [[ "${SCHEMA}" == "http" ]]; then
+            # Disable SSL Everywhere
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '0', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '0', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED_EVERYWHERE';"
+        else
+            # Enable SSL Everywhere
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED_EVERYWHERE';"
+        fi
+    fi
 
     # Keep script Running
     trap : TERM INT; (while true; do sleep 1m; done) & wait
