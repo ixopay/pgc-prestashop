@@ -207,7 +207,7 @@ if [ ! -f "/setup_complete" ]; then
             mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN';"
             mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN_SSL';"
             # Fix Image URLs
-            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1' WHERE \`name\` = 'PS_REWRITING_SETTINGS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '0' WHERE \`name\` = 'PS_REWRITING_SETTINGS';"
             # Update Hostname
             if [[ "${SCHEMA}" == "http" ]]; then
                 # Disable SSL Everywhere
@@ -218,6 +218,10 @@ if [ ! -f "/setup_complete" ]; then
                 mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED';"
                 mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED_EVERYWHERE';"
             fi
+            # Flush Cache
+            rm -rf /bitnami/prestashop/cache/smarty/cache/*
+            rm -rf /bitnami/prestashop/cache/smarty/compile/*
+            rm -rf /bitnami/prestashop/img/tmp/*
         fi
 
         # Keep script Running
@@ -231,7 +235,7 @@ else
         mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN';"
         mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN_SSL';"
         # Fix Image URLs
-        mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1' WHERE \`name\` = 'PS_REWRITING_SETTINGS';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '0' WHERE \`name\` = 'PS_REWRITING_SETTINGS';"
         # Update Hostname
         if [[ "${SCHEMA}" == "http" ]]; then
             # Disable SSL Everywhere
@@ -242,6 +246,10 @@ else
             mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED';"
             mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED_EVERYWHERE';"
         fi
+        # Flush Cache
+        rm -rf /opt/bitnami/prestashop/cache/smarty/cache/*
+        rm -rf /opt/bitnami/prestashop/cache/smarty/compile/*
+        rm -rf /opt/bitnami/prestashop/img/tmp/*
     fi
 
     # Keep script Running
