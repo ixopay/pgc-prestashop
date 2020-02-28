@@ -1,6 +1,8 @@
 # Release Notes
 
 ## Unreleased
+
+## v1.3.0 (2020-02-28)
 ### Fixed
 - Refactor front.js and seamless template to allow for multiple cards with seamless integration
 
