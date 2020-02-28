@@ -1,5 +1,9 @@
 # Release Notes
 
+## Unreleased
+### Fixed
+- Refactor front.js and seamless template to allow for multiple cards with seamless integration
+
 ## v1.2.2 (2019-12-16)
 ### Changed
 - remove old 1.6 PrestaShop flags
