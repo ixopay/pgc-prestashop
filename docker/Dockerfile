@@ -10,6 +10,7 @@ ENV PRECONFIGURE="" \
     REPOSITORY="https://github.com/user/repo" \
     BRANCH="master" \
     DEMO_CUSTOMER_PASSWORD="customer" \
+    SCHEMA="" \
     WHITELABEL="" \
     BUILD_ARTIFACT="undefined" \
     SHOP_PGC_URL="sandbox" \
