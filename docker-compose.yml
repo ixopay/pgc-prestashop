@@ -11,11 +11,11 @@ services:
   prestashop:
     build: 'docker/'
     volumes:
-      - '.:/source'
+      - './src:/bitnami/prestashop/modules/paymentgatewaycloud'
       - '${BUILD_ARTIFACT:-undefined}:/dist/paymentgatewaycloud.zip'
     ports:
-      - '80:80'
-      - '443:443'
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
     depends_on:
       - mariadb
     environment:
@@ -43,6 +43,8 @@ services:
       - PRESTASHOP_LANGUAGE=${PRESTASHOP_LANGUAGE:-en}
       - PRESTASHOP_LAST_NAME=${PRESTASHOP_LAST_NAME:-LastName}
       - PRESTASHOP_PASSWORD=${PRESTASHOP_PASSWORD:-bitnami1}
+      - HTTP_PORT=${HTTP_PORT:-80}
+      - HTTPS_PORT=${HTTPS_PORT:-443}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_PORT=${SMTP_PORT}

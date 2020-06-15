@@ -16,6 +16,8 @@ Clone our plugin repository and run the following command from the plugin root d
  REPOSITORY="https://github.com/ixopay/pgc-prestashop" \
  BRANCH="master" \
  PRESTASHOP_HOST="localhost" \
+ HTTP_PORT="8082" \
+ HTTPS_PORT="8443" \
  PRESTASHOP_EMAIL="dev@example.com" \
  PRESTASHOP_PASSWORD="dev123" \
   docker-compose -f docker-compose.github.yml up --build --force-recreate --renew-anon-volumes
@@ -27,6 +29,8 @@ To develop and test plugin changes, you can run the following docker-compose com
  # PRESTASHOP_PASSWORD must contain numeral and consist of 6+ chars
  BITNAMI_IMAGE_VERSION="latest" \
  PRESTASHOP_HOST="localhost" \
+ HTTP_PORT="8082" \
+ HTTPS_PORT="8443" \
  PRESTASHOP_EMAIL="dev@example.com" \
  PRESTASHOP_PASSWORD="dev123" \
   docker-compose up --build --force-recreate --renew-anon-volumes

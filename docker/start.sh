@@ -33,35 +33,34 @@ if [ ! -f "/setup_complete" ]; then
         if [ -f /dist/paymentgatewaycloud.zip ]; then
             echo -e "Using Supplied zip ${BUILD_ARTIFACT}"
             cp /dist/paymentgatewaycloud.zip /paymentgatewaycloud.zip
+            php /opt/bitnami/prestashop/bin/console prestashop:module install /paymentgatewaycloud.zip || error_exit "Failed to Install PGC Extension"
         else
             error_exit "Faled to build!, there is no such file: ${BUILD_ARTIFACT}"
         fi
     else
-        if [ ! -d "/source/.git" ] && [ ! -f  "/source/.git" ]; then
+        if [ ! -d "/opt/bitnami/prestashop/modules/paymentgatewaycloud" ] && [ ! -f  "/opt/bitnami/prestashop/modules/paymentgatewaycloud" ]; then
             echo -e "Checking out branch ${BRANCH} from ${REPOSITORY}"
             git clone $REPOSITORY /tmp/paymentgatewaycloud || error_exit "Faled to clone ${BUILD_ARTIFACT}"
             cd /tmp/paymentgatewaycloud
             git checkout $BRANCH || error_exit "Faled to checkout ${BRANCH}"
+        
+            if [ ! -z "${WHITELABEL}" ]; then
+                echo -e "Running Whitelabel Script for ${WHITELABEL}"
+                echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" || error_exit "Faled to Run Whitelabel Scriptfor '$WHITELABEL'"
+                DEST_FILE="$(echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" | tail -n 1 | sed 's/.*Created file "\(.*\)".*/\1/g')" || error_exit "Faled to extract Zip File name"
+                DB_FIELD_NAME="$(php /whitelabel.php constantCase "${WHITELABEL}")" || error_exit "Failed to extract DB-Field Name"
+                cp "${DEST_FILE}" /paymentgatewaycloud.zip
+                php /opt/bitnami/prestashop/bin/console prestashop:module install /paymentgatewaycloud.zip || error_exit "Failed to Install PGC Extension"
+            else
+                mv src paymentgatewaycloud
+                zip -q -r /paymentgatewaycloud.zip paymentgatewaycloud
+                php /opt/bitnami/prestashop/bin/console prestashop:module install /paymentgatewaycloud.zip || error_exit "Failed to Install PGC Extension"
+            fi
         else
             echo -e "Using Development Source!"
-            mkdir -p /tmp/paymentgatewaycloud
-            cp -R /source/* /tmp/paymentgatewaycloud/
-        fi
-        cd /tmp/paymentgatewaycloud
-        if [ ! -z "${WHITELABEL}" ]; then
-            echo -e "Running Whitelabel Script for ${WHITELABEL}"
-            echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" || error_exit "Faled to Run Whitelabel Scriptfor '$WHITELABEL'"
-            DEST_FILE="$(echo "y" | php build.php "gateway.mypaymentprovider.com" "${WHITELABEL}" | tail -n 1 | sed 's/.*Created file "\(.*\)".*/\1/g')" || error_exit "Faled to extract Zip File name"
-            DB_FIELD_NAME="$(php /whitelabel.php constantCase "${WHITELABEL}")" || error_exit "Failed to extract DB-Field Name"
-            cp "${DEST_FILE}" /paymentgatewaycloud.zip
-        else
-           mv src paymentgatewaycloud
-           zip -q -r /paymentgatewaycloud.zip paymentgatewaycloud
         fi
     fi
-    
-    php /opt/bitnami/prestashop/bin/console prestashop:module install /paymentgatewaycloud.zip || error_exit "Failed to Install PGC Extension"
-    
+        
     if [ $PRECONFIGURE ]; then
         # Enable SSL Everywhere
         mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1', \`date_upd\` = NOW() WHERE \`name\` = 'PS_SSL_ENABLED';"
@@ -192,8 +191,6 @@ if [ ! -f "/setup_complete" ]; then
 		mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_log\` (severity, error_code, message, object_id, id_employee, object_type, date_add, date_upd) VALUES ('1', '0', 'CustomerAddress addition', '${DEMO_ADDRESS_ID}', '1', 'CustomerAddress', NOW(), NOW());"
     fi
 
-    echo -e "Setup Complete! You can access the instance at: http://${PRESTASHOP_HOST}/"
-
     touch /setup_complete
 
     if [ $PRECONFIGURE ]; then
@@ -202,12 +199,31 @@ if [ ! -f "/setup_complete" ]; then
         exit 0
     else 
         if [ $PRESTASHOP_HOST ]; then
-            echo -e "Updating Shop URL to: ${PRESTASHOP_HOST}"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_shop_url\` SET \`domain\` = '${PRESTASHOP_HOST}', \`domain_ssl\` = '${PRESTASHOP_HOST}' WHERE \`id_shop_url\` = 1;"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN';"
-            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN_SSL';"
+            echo -e "Updating Shop URL to: ${PRESTASHOP_HOST}:${HTTP_PORT}"
+            chmod 666 /opt/bitnami/prestashop/.htaccess
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_shop_url\` SET \`domain\` = '${PRESTASHOP_HOST}:${HTTP_PORT}', \`domain_ssl\` = '${PRESTASHOP_HOST}:${HTTPS_PORT}' WHERE \`id_shop_url\` = 1;"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}:${HTTP_PORT}' WHERE \`name\` = 'PS_SHOP_DOMAIN';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}:${HTTPS_PORT}' WHERE \`name\` = 'PS_SHOP_DOMAIN_SSL';"
+            #sed -i "s/RewriteCond \%{HTTP_HOST} \^localhost\$/RewriteCond \%{HTTP_HOST} \^${PRESTASHOP_HOST}:${HTTP_PORT}\$/g" /opt/bitnami/prestashop/.htaccess
+            
             # Fix Image URLs
-            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '0' WHERE \`name\` = 'PS_REWRITING_SETTINGS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = NULL WHERE \`name\` = 'PS_REWRITING_SETTINGS';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '2' WHERE \`name\` = 'PS_CCCJS_VERSION';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '2' WHERE \`name\` = 'PS_CCCCSS_VERSION';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '0' WHERE \`name\` = 'PS_HTACCESS_CACHE_CONTROL';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1' WHERE \`name\` = 'GF_INSTALL_CALC';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1' WHERE \`name\` = 'ONBOARDINGV2_SHUT_DOWN';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = NULL WHERE \`name\` = 'GF_NOT_VIEWED_BADGE';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '{id}-{rewrite}' WHERE \`name\` = 'PS_ROUTE_category_rule';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = 'supplier/{id}-{rewrite}' WHERE \`name\` = 'PS_ROUTE_supplier_rule';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = 'brand/{id}-{rewrite}' WHERE \`name\` = 'PS_ROUTE_manufacturer_rule';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = 'content/{id}-{rewrite}' WHERE \`name\` = 'PS_ROUTE_cms_rule';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = 'content/category/{id}-{rewrite}' WHERE \`name\` = 'PS_ROUTE_cms_category_rule';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = 'module/{module}{/:controller}' WHERE \`name\` = 'PS_ROUTE_module';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '{category:/}{id}{-:id_product_attribute}-{rewrite}{-:ean13}.html' WHERE \`name\` = 'PS_ROUTE_product_rule';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '{id}-{rewrite}{/:selected_filters}' WHERE \`name\` = 'PS_ROUTE_layered_rule';"
+            mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '1' WHERE \`name\` = 'PS_REWRITING_SETTINGS';"
+
             # Update Hostname
             if [[ "${SCHEMA}" == "http" ]]; then
                 # Disable SSL Everywhere
@@ -222,7 +238,12 @@ if [ ! -f "/setup_complete" ]; then
             rm -rf /bitnami/prestashop/cache/smarty/cache/*
             rm -rf /bitnami/prestashop/cache/smarty/compile/*
             rm -rf /bitnami/prestashop/img/tmp/*
+            rm -rf /tmp
+            rm -rf /bitnami/prestashop/.htaccess
+            rm -rf /opt/bitnami/prestashop/.htaccess
         fi
+
+        echo -e "Setup Complete! You can access the instance at: http://${PRESTASHOP_HOST}:${HTTP_PORT}/"
 
         # Keep script Running
         trap : TERM INT; (while true; do sleep 1m; done) & wait
@@ -230,7 +251,7 @@ if [ ! -f "/setup_complete" ]; then
 
 else
     if [ $PRESTASHOP_HOST ]; then
-        echo -e "Updating Shop URL to: ${PRESTASHOP_HOST}"
+        echo -e "Updating Shop URL to: ${PRESTASHOP_HOST}:${HTTP_PORT}"
         mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_shop_url\` SET \`domain\` = '${PRESTASHOP_HOST}', \`domain_ssl\` = '${PRESTASHOP_HOST}' WHERE \`id_shop_url\` = 1;"
         mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN';"
         mysql -u root -h mariadb bitnami_prestashop -B -e "UPDATE \`ps_configuration\` SET \`value\` = '${PRESTASHOP_HOST}' WHERE \`name\` = 'PS_SHOP_DOMAIN_SSL';"
