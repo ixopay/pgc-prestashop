@@ -1,4 +1,4 @@
-FROM bitnami/prestashop:latest
+FROM bitnami/prestashop:1.7-debian-10
 
 EXPOSE 80
 
