@@ -80,7 +80,7 @@ if [ ! -f "/setup_complete" ]; then
     # Enable PGC Payment Providers
     if [ $SHOP_PGC_URL ]; then
         echo -e "Enabling PGC Extension"
-        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`date_add\` = NOW(), \`date_add\` = NOW(), \`name\` = '${DB_FIELD_NAME}_ENABLED';"
+        mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`date_add\` = NOW(), \`name\` = '${DB_FIELD_NAME}_ENABLED';"
         mysql -u root -h mariadb bitnami_prestashop -B -e "DELETE FROM \`ps_configuration\` WHERE \`name\` = '${DB_FIELD_NAME}_HOST';"
         mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '$SHOP_PGC_URL',\`date_upd\` = NOW(), \`date_add\` = NOW(), \`name\` = '${DB_FIELD_NAME}_HOST';"
         mysql -u root -h mariadb bitnami_prestashop -B -e "INSERT INTO \`ps_configuration\` SET \`value\` = '1',\`date_upd\` = NOW(), \`date_add\` = NOW(), \`name\` = '${DB_FIELD_NAME}_CREDITCARD_ENABLED';"
