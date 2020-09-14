@@ -1,4 +1,5 @@
-FROM bitnami/prestashop:1.7-debian-10
+ARG UPSTREAM_TAG=${UPSTREAM_TAG:-latest}  
+FROM bitnami/prestashop:${UPSTREAM_TAG}
 
 EXPOSE 80
 
