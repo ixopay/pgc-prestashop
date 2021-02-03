@@ -1,54 +1,33 @@
-version: '3'
-
+version: '2'
 services:
   mariadb:
-    image: 'bitnami/mariadb:10.1'
-    hostname: mariadb
+    image: 'docker.io/bitnami/mariadb:10.3-debian-10'
     environment:
+      - ALLOW_EMPTY_PASSWORD=yes
       - MARIADB_USER=bn_prestashop
       - MARIADB_DATABASE=bitnami_prestashop
-      - ALLOW_EMPTY_PASSWORD=yes
-  prestashop:
-    build: 'docker/'
     volumes:
-      - '.:/source'
-      - '${BUILD_ARTIFACT:-undefined}:/dist/paymentgatewaycloud.zip'
+      - 'mariadb_data:/bitnami/mariadb'
+  prestashop:
+    image: 'docker.io/bitnami/prestashop:1.7-debian-10'
     ports:
-      - '80:80'
-      - '443:443'
-    depends_on:
-      - mariadb
+      - '80:8080'
+      - '443:8443'
     environment:
-      - SCHEMA=http
-      - ALLOW_EMPTY_PASSWORD=${ALLOW_EMPTY_PASSWORD:-yes}
-      - WHITELABEL=${WHITELABEL:-}
-      - BITNAMI_APP_NAME=${BITNAMI_APP_NAME:-prestashop}
-      - BITNAMI_IMAGE_VERSION=${BITNAMI_IMAGE_VERSION:-latest}
-      - MARIADB_HOST=${MARIADB_HOST:-mariadb}
-      - MARIADB_PORT_NUMBER=${MARIADB_PORT_NUMBER:-3306}
-      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
-      - MARIADB_ROOT_USER=${MARIADB_ROOT_USER:-root}
-      - MYSQL_CLIENT_CREATE_DATABASE_NAME=${MYSQL_CLIENT_CREATE_DATABASE_NAME}
-      - MYSQL_CLIENT_CREATE_DATABASE_PASSWORD=${MYSQL_CLIENT_CREATE_DATABASE_PASSWORD}
-      - MYSQL_CLIENT_CREATE_DATABASE_PRIVILEGES=${MYSQL_CLIENT_CREATE_DATABASE_PRIVILEGES:-ALL}
-      - MYSQL_CLIENT_CREATE_DATABASE_USER=${MYSQL_CLIENT_CREATE_DATABASE_USER}
-      - PRESTASHOP_COOKIE_CHECK_IP=${PRESTASHOP_COOKIE_CHECK_IP:-yes}
-      - PRESTASHOP_COUNTRY=${PRESTASHOP_COUNTRY:-us}
-      - PRESTASHOP_DATABASE_NAME=${PRESTASHOP_DATABASE_NAME:-bitnami_prestashop}
-      - PRESTASHOP_DATABASE_PASSWORD=${PRESTASHOP_DATABASE_PASSWORD}
-      - PRESTASHOP_DATABASE_USER=${PRESTASHOP_DATABASE_USER:-bn_prestashop}
-      - PRESTASHOP_EMAIL=${PRESTASHOP_EMAIL:-user@example.com}
-      - PRESTASHOP_FIRST_NAME=${PRESTASHOP_FIRST_NAME:-FirstName}
+      - ALLOW_EMPTY_PASSWORD=yes
+      - PRESTASHOP_DATABASE_HOST=mariadb
+      - PRESTASHOP_DATABASE_PORT_NUMBER=3306
+      - PRESTASHOP_DATABASE_USER=bn_prestashop
+      - PRESTASHOP_DATABASE_NAME=bitnami_prestashop
       - PRESTASHOP_HOST=${PRESTASHOP_HOST:-localhost}
+      - WHITELABEL=${WHITELABEL:-AwesomePay}
+      - PRESTASHOP_COUNTRY=${PRESTASHOP_COUNTRY:-us}
       - PRESTASHOP_LANGUAGE=${PRESTASHOP_LANGUAGE:-en}
-      - PRESTASHOP_LAST_NAME=${PRESTASHOP_LAST_NAME:-LastName}
+      - PRESTASHOP_EMAIL=${PRESTASHOP_EMAIL:-user@example.com}
       - PRESTASHOP_PASSWORD=${PRESTASHOP_PASSWORD:-bitnami1}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_PROTOCOL=${SMTP_PROTOCOL}
-      - SMTP_USER=${SMTP_USER}
-      - PRECONFIGURE=${PRECONFIGURE}
+      - HTTP_PORT=${HTTP_PORT:-8080}
+      - HTTPS_PORT=${HTTPS_PORT:-8443}
+      - HTTPS=false
       - REPOSITORY=${REPOSITORY:-https://github.com/user/repo}
       - BRANCH=${BRANCH:-master}
       - DEMO_CUSTOMER_PASSWORD=${DEMO_CUSTOMER_PASSWORD:-customer}
@@ -75,7 +54,13 @@ services:
       - SHOP_PGC_CC_MASTERCARD_SEAMLESS=${SHOP_PGC_CC_MASTERCARD_SEAMLESS:-0}
       - SHOP_PGC_CC_UNIONPAY_SEAMLESS=${SHOP_PGC_CC_UNIONPAY_SEAMLESS:-1}
       - SHOP_PGC_CC_VISA_SEAMLESS=${SHOP_PGC_CC_VISA_SEAMLESS:-1}
-      - BUILD_ARTIFACT=${BUILD_ARTIFACT:-undefined}
-
+    volumes:
+      - 'prestashop_data:/bitnami/prestashop'
+      - './docker/configure.sh:/docker-entrypoint-init.d/configure.sh:ro'
+    depends_on:
+      - mariadb
 volumes:
-  undefined:
+  mariadb_data:
+    driver: local
+  prestashop_data:
+    driver: local
